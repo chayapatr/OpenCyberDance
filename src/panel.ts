@@ -24,13 +24,23 @@ interface Handlers {
   showGraph(visible: boolean): void
   setCamera(): void
   axisPoint(): void
+  startPostures(): void
+  stopPostures(): void
+  postureDebug(): void
+}
+
+const createGUI = () => {
+  const gui = new GUI({ width: 310 })
+  gui.hide()
+
+  return gui
 }
 
 export class Panel {
   initialized = false
 
   params: Params
-  panel = new GUI({ width: 310 })
+  panel = createGUI()
 
   energyFolder: GUI | null = null
   spaceFolder: GUI | null = null
@@ -43,6 +53,7 @@ export class Panel {
   commandFolder: GUI | null = null
   characterFolder: GUI | null = null
   axisPointFolder: GUI | null = null
+  postureDebugFolder: GUI | null = null
 
   handlers: Handlers = {
     energy: () => {},
@@ -62,6 +73,9 @@ export class Panel {
     showGraph: () => {},
     setCamera: () => {},
     axisPoint: () => {},
+    startPostures: () => {},
+    stopPostures: () => {},
+    postureDebug: () => {},
   }
 
   constructor(params: Params) {
@@ -192,6 +206,7 @@ export class Panel {
     this.spaceFolder = panel.addFolder('External Body Space')
     this.axisPointFolder = panel.addFolder('Axis Point')
     this.characterFolder = panel.addFolder('Characters')
+    this.postureDebugFolder = panel.addFolder('🔧 Posture Debug')
 
     this.addRotations()
     this.addEnergy('upper', 'lower')
@@ -257,6 +272,7 @@ export class Panel {
     this.addCurveControl()
     this.addSpaceControl()
     this.addAxisPointControl()
+    this.addPostureDebugControl()
 
     // this.commandFolder.open()
     // this.rotationFolder.open()
@@ -270,17 +286,20 @@ export class Panel {
   addAxisPointControl() {
     if (!this.axisPointFolder) return
 
+    // Add posture controls
     this.axisPointFolder
-      .add(this.params.axisPoint, 'threshold', 0, 10, 0.001)
+      .add({ startPostures: this.startPostures.bind(this) }, 'startPostures')
+      .name('🎯 Start Postures')
+
+    this.axisPointFolder
+      .add({ stopPostures: this.stopPostures.bind(this) }, 'stopPostures')
+      .name('🛑 Stop Postures')
+
+    // Original axis point controls
+    this.axisPointFolder
+      .add(this.params.axisPoint, 'frequency', 0, 1, 0.001)
       .listen()
       .onChange(this.handlers.axisPoint)
-
-    for (const part of Object.keys(axisPointControlParts)) {
-      this.axisPointFolder
-        ?.add(this.params.axisPoint.parts, part)
-        .listen()
-        .onChange(this.handlers.axisPoint)
-    }
   }
 
   updateKey() {
@@ -316,6 +335,288 @@ export class Panel {
     if (!command) return
 
     this.handlers.prompt.bind(this)(command)
+  }
+
+  startPostures() {
+    this.handlers.startPostures()
+    console.log(`>>> panel::startPostures`)
+  }
+
+  stopPostures() {
+    this.handlers.stopPostures()
+    console.log(`>>> panel::stopPostures`)
+  }
+
+  addPostureDebugControl() {
+    if (!this.postureDebugFolder) return
+
+    // Enable/disable debug mode
+    this.postureDebugFolder
+      .add(this.params.postureDebug, 'enabled')
+      .name('🔧 Enable Debug Mode')
+      .listen()
+      .onChange(this.handlers.postureDebug)
+
+    // Left Arm Controls
+    const leftArmFolder = this.postureDebugFolder.addFolder('👈 Left Arm')
+
+    // Left Upperarm
+    const leftUpperarmFolder = leftArmFolder.addFolder('Upper Arm')
+    leftUpperarmFolder
+      .add(
+        this.params.postureDebug.leftArm.upperarm,
+        'x',
+        -Math.PI * 2,
+        Math.PI * 2,
+        0.01,
+      )
+      .name('X Rotation (forward/back)')
+      .listen()
+      .onChange(this.handlers.postureDebug)
+    leftUpperarmFolder
+      .add(
+        this.params.postureDebug.leftArm.upperarm,
+        'y',
+        -Math.PI * 2,
+        Math.PI * 2,
+        0.01,
+      )
+      .name('Y Rotation (up/down)')
+      .listen()
+      .onChange(this.handlers.postureDebug)
+    leftUpperarmFolder
+      .add(
+        this.params.postureDebug.leftArm.upperarm,
+        'z',
+        -Math.PI * 2,
+        Math.PI * 2,
+        0.01,
+      )
+      .name('Z Rotation (left/right)')
+      .listen()
+      .onChange(this.handlers.postureDebug)
+
+    // Left Forearm
+    const leftForearmFolder = leftArmFolder.addFolder('Forearm')
+    leftForearmFolder
+      .add(
+        this.params.postureDebug.leftArm.forearm,
+        'x',
+        -Math.PI * 2,
+        Math.PI * 2,
+        0.01,
+      )
+      .name('X Rotation (forward/back)')
+      .listen()
+      .onChange(this.handlers.postureDebug)
+    leftForearmFolder
+      .add(
+        this.params.postureDebug.leftArm.forearm,
+        'y',
+        -Math.PI * 2,
+        Math.PI * 2,
+        0.01,
+      )
+      .name('Y Rotation (up/down)')
+      .listen()
+      .onChange(this.handlers.postureDebug)
+    leftForearmFolder
+      .add(
+        this.params.postureDebug.leftArm.forearm,
+        'z',
+        -Math.PI * 2,
+        Math.PI * 2,
+        0.01,
+      )
+      .name('Z Rotation (left/right)')
+      .listen()
+      .onChange(this.handlers.postureDebug)
+
+    // Left Hand
+    const leftHandFolder = leftArmFolder.addFolder('Hand')
+    leftHandFolder
+      .add(
+        this.params.postureDebug.leftArm.hand,
+        'x',
+        -Math.PI * 2,
+        Math.PI * 2,
+        0.01,
+      )
+      .name('X Rotation (forward/back)')
+      .listen()
+      .onChange(this.handlers.postureDebug)
+    leftHandFolder
+      .add(
+        this.params.postureDebug.leftArm.hand,
+        'y',
+        -Math.PI * 2,
+        Math.PI * 2,
+        0.01,
+      )
+      .name('Y Rotation (up/down)')
+      .listen()
+      .onChange(this.handlers.postureDebug)
+    leftHandFolder
+      .add(
+        this.params.postureDebug.leftArm.hand,
+        'z',
+        -Math.PI * 2,
+        Math.PI * 2,
+        0.01,
+      )
+      .name('Z Rotation (left/right)')
+      .listen()
+      .onChange(this.handlers.postureDebug)
+
+    // Right Arm Controls
+    const rightArmFolder = this.postureDebugFolder.addFolder('👉 Right Arm')
+
+    // Right Upperarm
+    const rightUpperarmFolder = rightArmFolder.addFolder('Upper Arm')
+    rightUpperarmFolder
+      .add(
+        this.params.postureDebug.rightArm.upperarm,
+        'x',
+        -Math.PI * 2,
+        Math.PI * 2,
+        0.01,
+      )
+      .name('X Rotation (forward/back)')
+      .listen()
+      .onChange(this.handlers.postureDebug)
+    rightUpperarmFolder
+      .add(
+        this.params.postureDebug.rightArm.upperarm,
+        'y',
+        -Math.PI * 2,
+        Math.PI * 2,
+        0.01,
+      )
+      .name('Y Rotation (up/down)')
+      .listen()
+      .onChange(this.handlers.postureDebug)
+    rightUpperarmFolder
+      .add(
+        this.params.postureDebug.rightArm.upperarm,
+        'z',
+        -Math.PI * 2,
+        Math.PI * 2,
+        0.01,
+      )
+      .name('Z Rotation (left/right)')
+      .listen()
+      .onChange(this.handlers.postureDebug)
+
+    // Right Forearm
+    const rightForearmFolder = rightArmFolder.addFolder('Forearm')
+    rightForearmFolder
+      .add(
+        this.params.postureDebug.rightArm.forearm,
+        'x',
+        -Math.PI * 2,
+        Math.PI * 2,
+        0.01,
+      )
+      .name('X Rotation (forward/back)')
+      .listen()
+      .onChange(this.handlers.postureDebug)
+    rightForearmFolder
+      .add(
+        this.params.postureDebug.rightArm.forearm,
+        'y',
+        -Math.PI * 2,
+        Math.PI * 2,
+        0.01,
+      )
+      .name('Y Rotation (up/down)')
+      .listen()
+      .onChange(this.handlers.postureDebug)
+    rightForearmFolder
+      .add(
+        this.params.postureDebug.rightArm.forearm,
+        'z',
+        -Math.PI * 2,
+        Math.PI * 2,
+        0.01,
+      )
+      .name('Z Rotation (left/right)')
+      .listen()
+      .onChange(this.handlers.postureDebug)
+
+    // Right Hand
+    const rightHandFolder = rightArmFolder.addFolder('Hand')
+    rightHandFolder
+      .add(
+        this.params.postureDebug.rightArm.hand,
+        'x',
+        -Math.PI * 2,
+        Math.PI * 2,
+        0.01,
+      )
+      .name('X Rotation (forward/back)')
+      .listen()
+      .onChange(this.handlers.postureDebug)
+    rightHandFolder
+      .add(
+        this.params.postureDebug.rightArm.hand,
+        'y',
+        -Math.PI * 2,
+        Math.PI * 2,
+        0.01,
+      )
+      .name('Y Rotation (up/down)')
+      .listen()
+      .onChange(this.handlers.postureDebug)
+    rightHandFolder
+      .add(
+        this.params.postureDebug.rightArm.hand,
+        'z',
+        -Math.PI * 2,
+        Math.PI * 2,
+        0.01,
+      )
+      .name('Z Rotation (left/right)')
+      .listen()
+      .onChange(this.handlers.postureDebug)
+
+    // Head Controls
+    const headFolder = this.postureDebugFolder.addFolder('🗣️ Head')
+    headFolder
+      .add(this.params.postureDebug.head, 'x', -Math.PI / 4, Math.PI / 4, 0.01)
+      .name('X Rotation (nod up/down)')
+      .listen()
+      .onChange(this.handlers.postureDebug)
+    headFolder
+      .add(this.params.postureDebug.head, 'y', -Math.PI / 4, Math.PI / 4, 0.01)
+      .name('Y Rotation (turn left/right)')
+      .listen()
+      .onChange(this.handlers.postureDebug)
+    headFolder
+      .add(this.params.postureDebug.head, 'z', -Math.PI / 4, Math.PI / 4, 0.01)
+      .name('Z Rotation (tilt left/right)')
+      .listen()
+      .onChange(this.handlers.postureDebug)
+
+    // Helper buttons
+    this.postureDebugFolder
+      .add({ reset: () => this.resetPostureDebug() }, 'reset')
+      .name('🔄 Reset All Rotations')
+
+    console.log('Added posture debug controls')
+  }
+
+  resetPostureDebug() {
+    // Reset all debug rotations to zero
+    this.params.postureDebug.leftArm.upperarm = { x: 0, y: 0, z: 0 }
+    this.params.postureDebug.leftArm.forearm = { x: 0, y: 0, z: 0 }
+    this.params.postureDebug.leftArm.hand = { x: 0, y: 0, z: 0 }
+    this.params.postureDebug.rightArm.upperarm = { x: 0, y: 0, z: 0 }
+    this.params.postureDebug.rightArm.forearm = { x: 0, y: 0, z: 0 }
+    this.params.postureDebug.rightArm.hand = { x: 0, y: 0, z: 0 }
+    this.params.postureDebug.head = { x: 0, y: 0, z: 0 }
+
+    this.handlers.postureDebug()
+    console.log('Reset all posture debug rotations')
   }
 
   reset() {

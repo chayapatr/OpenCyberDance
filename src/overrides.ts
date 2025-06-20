@@ -39,8 +39,21 @@ export interface SpaceConfig {
 }
 
 export interface AxisPointConfig {
-  threshold: number
+  frequency: number
   parts: Record<AxisPointControlParts, boolean>
+}
+
+export interface ArmDebugConfig {
+  upperarm: { x: number; y: number; z: number }
+  forearm: { x: number; y: number; z: number }
+  hand: { x: number; y: number; z: number }
+}
+
+export interface PostureDebugConfig {
+  enabled: boolean
+  leftArm: ArmDebugConfig
+  rightArm: ArmDebugConfig
+  head: { x: number; y: number; z: number }
 }
 
 export class Params {
@@ -99,7 +112,7 @@ export class Params {
   }
 
   axisPoint: AxisPointConfig = {
-    threshold: 0,
+    frequency: 0,
 
     parts: {
       leftArm: true,
@@ -118,6 +131,21 @@ export class Params {
       model: 'waiting',
       action: '',
     },
+  }
+
+  postureDebug: PostureDebugConfig = {
+    enabled: false,
+    leftArm: {
+      upperarm: { x: 0, y: 0, z: 0 },
+      forearm: { x: 0, y: 0, z: 0 },
+      hand: { x: 0, y: 0, z: 0 },
+    },
+    rightArm: {
+      upperarm: { x: 0, y: 0, z: 0 },
+      forearm: { x: 0, y: 0, z: 0 },
+      hand: { x: 0, y: 0, z: 0 },
+    },
+    head: { x: 0, y: 0, z: 0 },
   }
 
   // ! HACK: temporary reactivity hack. TO REMOVE!
@@ -151,7 +179,7 @@ export class Params {
     this.axisPoint.parts.rightArm = defaults.axisPoint.parts.rightArm
     this.axisPoint.parts.leftLeg = defaults.axisPoint.parts.leftLeg
     this.axisPoint.parts.rightLeg = defaults.axisPoint.parts.rightLeg
-    this.axisPoint.threshold = defaults.axisPoint.threshold
+    this.axisPoint.frequency = defaults.axisPoint.frequency
   }
 }
 

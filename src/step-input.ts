@@ -162,11 +162,17 @@ export const choices = {
       },
     ],
   },
-  // axis: {
-  //   title: 'axis point',
-  //   triggers: ['axis'],
-  //   steps: [steps.axisParts, steps.percent],
-  // },
+  axis: {
+    title: 'axis point',
+    triggers: ['axis'],
+    steps: [
+      {
+        type: 'percent',
+        current: () => CurrentPercent.axis(),
+        max: 120,
+      },
+    ],
+  },
   rotations: {
     title: 'rotations',
     triggers: ['turn', 'rotation'],

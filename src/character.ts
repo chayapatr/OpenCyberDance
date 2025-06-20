@@ -13,6 +13,7 @@ import {
 } from 'three'
 
 import { KeyframeAnalyzer } from './analyze'
+import { BoneRotationManager } from './bone-rotation'
 import { CameraPresetKey } from './camera'
 import { dispose } from './dispose'
 import { CCDIKHelper } from './ik/ccd-ik-helper'
@@ -32,7 +33,6 @@ import {
   Params,
 } from './overrides'
 import {
-  AxisPointControlParts,
   CurvePartKey,
   curveParts,
   EnergyPartKey,
@@ -86,7 +86,7 @@ export type CharacterKey = keyof typeof Params.prototype.characters
 const NTH_FRAME_TICK = 58
 
 export const resetLimits: Partial<Record<ModelKey, number>> = {
-  terry: 160,
+  poon: 160,
   changhung: 300,
   yokrob: 202,
   yokroblingImprovise: 220,
@@ -121,6 +121,7 @@ type DebugSpheres = { forehead?: Mesh; neck?: Mesh; body?: Mesh }
 type AnimationFlags = object
 
 const DEBUG_SKELETON = false
+export const INITIAL_MODEL: ModelKey = 'waiting'
 
 export class Character {
   scene: THREE.Scene | null = null
@@ -132,6 +133,7 @@ export class Character {
   params: Params | null = null
   analyzer: KeyframeAnalyzer | null = null
   ik: IKManager | null = null
+  boneRotation: BoneRotationManager | null = null
 
   flags: AnimationFlags = {}
 
@@ -250,6 +252,7 @@ export class Character {
     this.mixer = null
     this.skeletonHelper = null
     this.model = null
+    this.boneRotation = null
 
     this.original.clear()
     this.actions.clear()
@@ -418,6 +421,9 @@ export class Character {
       // Play the first animation
       this.updateAction()
 
+      // Initialize bone rotation manager
+      this.boneRotation = new BoneRotationManager(this)
+
       console.log('>>> setup completed')
     } catch (error) {
       if (error instanceof Error) {
@@ -571,6 +577,36 @@ export class Character {
     const clip = this.currentClip
     if (!clip || !this.params) return
 
+    if (flags.axisPoint) {
+      const frequency = this.params.axisPoint.frequency
+
+      const isCircleAndCurveActive =
+        Object.values(this.params.curve.parts).some((x) => !!x) &&
+        this.params.curve.equation !== 'none'
+
+      const isAxisPointVisiblyActive = frequency && frequency >= 0.05
+
+      // If BOTH axis point and circle and curve is active,
+      // we want to clear the altered track.
+      if (isAxisPointVisiblyActive && isCircleAndCurveActive) {
+        clip.tracks.forEach((track, index) => {
+          const original = this.originalOf(index)
+          if (!original) return
+
+          // clear the altered track, please.
+          track.values = original.values.slice(0)
+        })
+      }
+
+      if (frequency <= 0) {
+        this.boneRotation?.stop()
+      } else {
+        this.boneRotation?.start()
+      }
+
+      return
+    }
+
     const { freezeParams } = this.options
 
     if (freezeParams) {
@@ -617,32 +653,6 @@ export class Character {
         }
       }
 
-      if (flags.axisPoint) {
-        const { parts } = this.params.axisPoint
-        const part = trackNameToPart(track.name, 'axis')
-
-        if (part) {
-          const enabled = parts[part as AxisPointControlParts]
-
-          if (enabled) {
-            const time = this.mixer?.time ?? 1
-            const len = track.times.length - 1
-            const frame = Math.round((time / track.times[len]) * len)
-            const data = track.values.slice(frame * 4, frame * 4 + 4)
-
-            // Modify the entire keyframe values to this moment in time.
-            for (let i = 0; i < track.values.length; i += 4) {
-              let j = 0
-
-              track.values[i] = data[j++]
-              track.values[i + 1] = data[j++]
-              track.values[i + 2] = data[j++]
-              track.values[i + 3] = data[j++]
-            }
-          }
-        }
-      }
-
       if (flags.timing) {
         // Reset the keyframe times.
         track.times = original.timings.slice(0)
@@ -672,7 +682,11 @@ export class Character {
         _curve.tracks.includes(index) &&
         track.name.includes('quaternion')
 
-      if (isCurve && _curve.equation) {
+      const isAxisPointNotEnabled =
+        !this.params.axisPoint.frequency ||
+        this.params.axisPoint.frequency < 0.05
+
+      if (isCurve && _curve.equation && isAxisPointNotEnabled) {
         track.values = applyTrackTransform(track, _curve.equation, {
           axis: _curve.axis,
           tracks: _curve.tracks,
@@ -682,10 +696,6 @@ export class Character {
 
       clip.tracks[index] = track
     })
-
-    if (flags.axisPoint && this.ik) {
-      this.ik.setPartMorph(this.params.axisPoint)
-    }
 
     // External body space is always applied for timing changes.
     if (flags.timing) {
@@ -855,6 +865,12 @@ export class Character {
     this.frameCounter++
     this.mixer.update(delta)
 
+    // Apply real-time bone rotations after animation update
+    if (this.boneRotation?.isPostureActive) {
+      this.boneRotation.updateRotations(delta)
+      this.applyBoneOffsets()
+    }
+
     // Tick business logic every nth frames
     if (this.frameCounter % NTH_FRAME_TICK === 0) {
       // Reset the model time if it exceeds the playback
@@ -864,9 +880,6 @@ export class Character {
         this.mixer.setTime(0)
       }
 
-      // Tick animation logic
-      this.tickAxisPoint()
-
       // Update the global animation time
       if (this.isPrimary) {
         $time.set(this.mixer.time ?? 0)
@@ -875,12 +888,59 @@ export class Character {
   }
 
   /**
-   * Tick the axis point update using Inverse Kinematics.
-   *
-   * WARNING: this is super expensive as it is called every frame.
+   * Apply bone rotation offsets - ported from HTML prototype
+   * This applies the rotationOffset to each bone after the animation update
    */
-  tickAxisPoint() {
-    // TODO: inverse kinematics tick
+  applyBoneOffsets() {
+    if (!this.model) return
+
+    this.model.traverse((child) => {
+      if ((child as Bone).isBone || child.type === 'Bone') {
+        const bone = child as Bone
+
+        // Apply fixed rotation offsets
+        if (bone.rotationOffset) {
+          bone.rotation.x += bone.rotationOffset.x
+          bone.rotation.y += bone.rotationOffset.y
+          bone.rotation.z += bone.rotationOffset.z
+        }
+
+        // Apply random rotation offsets (for random arm pointing) - matching HTML prototype
+        if (bone.randomRotationOffset) {
+          bone.rotation.x += bone.randomRotationOffset.x
+          bone.rotation.y += bone.randomRotationOffset.y
+          bone.rotation.z += bone.randomRotationOffset.z
+        }
+      }
+    })
+  }
+
+  /**
+   * Start the real-time bone rotation posture system
+   */
+  startPostures() {
+    this.boneRotation?.start()
+  }
+
+  /**
+   * Stop the real-time bone rotation posture system
+   */
+  stopPostures() {
+    this.boneRotation?.stop()
+  }
+
+  /**
+   * Check if postures are currently active
+   */
+  get posturesActive(): boolean {
+    return this.boneRotation?.isPostureActive ?? false
+  }
+
+  /**
+   * Get the current posture name
+   */
+  get currentPostureName(): string {
+    return this.boneRotation?.currentPostureName ?? 'None'
   }
 
   async startFade() {
@@ -919,6 +979,8 @@ export class Character {
    * Warmup caches for External Body Space
    */
   prepareExternalBodySpaceCache() {
+    console.log('>>> prepareExternalBodySpaceCache', { options: this.options })
+
     const tracks = this.currentClip!.tracks
     const key = ebsCache.key(this)
 

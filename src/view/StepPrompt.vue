@@ -57,7 +57,6 @@ const isConfused = computed(() => status.value === 'confused')
 const isAnimationFinished = computed(() => time.value >= duration.value)
 
 const selectedStepChoiceTitles = computed(() => {
-  
   const steps = selectedChoice.value?.steps
   if (!steps) return []
 
@@ -104,7 +103,6 @@ const soundState = computed(() => {
 
   return 'loading'
 })
-
 </script>
 
 <template>
@@ -214,16 +212,26 @@ const soundState = computed(() => {
             >
           </div> -->
 
-          <div
-            class="space-y-2 pb-1"
-          >
-              <div v-if="currentPerc != null" class="text-neutral-500">> Current: {{ currentPerc }}%</div>
+          <div class="space-y-2 pb-1">
+            <div v-if="currentPerc != null" class="text-neutral-500">
+              > Current: {{ currentPerc }}%
+            </div>
 
-              <div v-for="i in (currentStep.max ? [0, 25, 50, 100, 150, 200, 300] : [0, 25, 50, 75, 100])" :key="i">
-                <div @click="addValue(`${(i)}`)" class="px-2 py-1 rounded animate__animated animate__fadeInUp hover:cursor-pointer hover:bg-white hover:text-black">
-                  > To {{ i }}%
-                </div>
+            <div
+              v-for="i in currentStep.max
+                ? currentStep.max === 300
+                  ? [0, 25, 50, 100, 150, 200, 300]
+                  : [0, 20, 40, 60, 80, 100, 120]
+                : [0, 25, 50, 75, 100]"
+              :key="i"
+            >
+              <div
+                @click="addValue(`${i}`)"
+                class="px-2 py-1 rounded animate__animated animate__fadeInUp hover:cursor-pointer hover:bg-white hover:text-black"
+              >
+                > To {{ i }}%
               </div>
+            </div>
           </div>
 
           <div
