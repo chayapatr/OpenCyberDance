@@ -5,7 +5,7 @@ export async function switchDancers(key: string) {
   const v2Match = /^(male|female):([1-9])$/.exec(key)
   if (!v2Match) return
 
-  const modelKey = `v2-${v2Match[1]}-${v2Match[2]}` as ModelKey
+  const modelKey = `${v2Match[1]}-${v2Match[2]}` as ModelKey
 
   if (!Character.sources[modelKey]) {
     console.error(`v2 model ${modelKey} not found`)

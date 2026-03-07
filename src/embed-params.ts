@@ -6,6 +6,7 @@ interface EmbedParams {
   showDebugInspector: boolean
   dancer: string | null
   cameraControl: boolean
+  silenceDing: boolean
 }
 
 export const getEmbedParams = (): EmbedParams => {
@@ -25,5 +26,6 @@ export const getEmbedParams = (): EmbedParams => {
     showDebugInspector: check('debug_inspector'),
     dancer: param.get('dancer'),
     cameraControl: check('camera_control'),
+    silenceDing: check('silence_ding'),
   }
 }

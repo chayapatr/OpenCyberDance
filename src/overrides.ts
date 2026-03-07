@@ -124,11 +124,11 @@ export class Params {
 
   characters: CharacterOptions = {
     first: {
-      model: 'v2-male-1',
+      model: 'male-1',
       action: '',
     },
     second: {
-      model: 'v2-male-1',
+      model: 'male-1',
       action: '',
     },
   }

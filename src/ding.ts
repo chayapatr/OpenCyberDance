@@ -1,6 +1,8 @@
 import { Howl, Howler } from 'howler'
 import { atom } from 'nanostores'
 
+import { getEmbedParams } from './embed-params'
+
 Howler.autoSuspend = false
 Howler.autoUnlock = true
 
@@ -12,6 +14,7 @@ class SoundManager {
 
   setup() {
     if ($soundReady.get() === true) return
+    if (getEmbedParams().silenceDing) return
 
     this.ding = new Howl({
       src: ['/sounds/khongwong_1.wav'],
@@ -57,6 +60,8 @@ class SoundManager {
 
   play() {
     if (!this.ding) return
+
+    if (getEmbedParams().silenceDing) return
 
     this.ding.stop()
     this.ding.play()

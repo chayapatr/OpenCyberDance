@@ -519,9 +519,7 @@ export class World {
       const { dancer } = getEmbedParams()
 
       const model: ModelKey =
-        dancer && dancer in Character.sources
-          ? (dancer as ModelKey)
-          : 'v2-male-1'
+        dancer && dancer in Character.sources ? (dancer as ModelKey) : 'male-1'
 
       await this.addCharacter({
         name: 'first',

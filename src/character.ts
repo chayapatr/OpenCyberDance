@@ -118,7 +118,7 @@ type DebugSpheres = { forehead?: Mesh; neck?: Mesh; body?: Mesh }
 type AnimationFlags = object
 
 const DEBUG_SKELETON = false
-export const INITIAL_MODEL: ModelKey = 'v2-male-1'
+export const INITIAL_MODEL: ModelKey = 'male-1'
 
 export class Character {
   scene: THREE.Scene | null = null
@@ -141,7 +141,7 @@ export class Character {
   options: CharacterOptions = {
     name: 'first',
     action: '',
-    model: 'v2-male-1',
+    model: 'male-1',
     scale: 0.008,
     position: [0, 0, 0],
     lengthen: 0,
@@ -153,49 +153,47 @@ export class Character {
   static sources = {
     none: '',
 
-    // V2 models
-    'v2-male-1': 'v2-models/male-1.glb',
-    'v2-male-2': 'v2-models/male-2.glb',
-    'v2-male-3': 'v2-models/male-3.glb',
-    'v2-male-4': 'v2-models/male-4.glb',
-    'v2-male-5': 'v2-models/male-5.glb',
-    'v2-male-6': 'v2-models/male-6.glb',
-    'v2-male-7': 'v2-models/male-7.glb',
-    'v2-male-8': 'v2-models/male-8.glb',
-    'v2-male-9': 'v2-models/male-9.glb',
-    'v2-female-1': 'v2-models/female-1.glb',
-    'v2-female-2': 'v2-models/female-2.glb',
-    'v2-female-3': 'v2-models/female-3.glb',
-    'v2-female-4': 'v2-models/female-4.glb',
-    'v2-female-5': 'v2-models/female-5.glb',
-    'v2-female-6': 'v2-models/female-6.glb',
-    'v2-female-7': 'v2-models/female-7.glb',
-    'v2-female-8': 'v2-models/female-8.glb',
-    'v2-female-9': 'v2-models/female-9.glb',
+    'male-1': 'v2-models/male-1.glb',
+    'male-2': 'v2-models/male-2.glb',
+    'male-3': 'v2-models/male-3.glb',
+    'male-4': 'v2-models/male-4.glb',
+    'male-5': 'v2-models/male-5.glb',
+    'male-6': 'v2-models/male-6.glb',
+    'male-7': 'v2-models/male-7.glb',
+    'male-8': 'v2-models/male-8.glb',
+    'male-9': 'v2-models/male-9.glb',
+    'female-1': 'v2-models/female-1.glb',
+    'female-2': 'v2-models/female-2.glb',
+    'female-3': 'v2-models/female-3.glb',
+    'female-4': 'v2-models/female-4.glb',
+    'female-5': 'v2-models/female-5.glb',
+    'female-6': 'v2-models/female-6.glb',
+    'female-7': 'v2-models/female-7.glb',
+    'female-8': 'v2-models/female-8.glb',
+    'female-9': 'v2-models/female-9.glb',
   }
 
   static defaultActions: Record<ModelKey, string> = {
     none: '',
 
-    // V2 models
-    'v2-male-1': 'Taesection1',
-    'v2-male-2': 'Taesection2',
-    'v2-male-3': 'Taesection3',
-    'v2-male-4': 'Taesection4',
-    'v2-male-5': 'Taesection5',
-    'v2-male-6': 'Taesection6',
-    'v2-male-7': 'Taesection7',
-    'v2-male-8': 'Taesection8',
-    'v2-male-9': 'Taesection9',
-    'v2-female-1': 'Gadesection1',
-    'v2-female-2': 'Gadesection2',
-    'v2-female-3': 'Gadesection3',
-    'v2-female-4': 'Gadesection4',
-    'v2-female-5': 'Gadesection5',
-    'v2-female-6': 'Gadesection6',
-    'v2-female-7': 'Gadesection7',
-    'v2-female-8': 'Gadesection8',
-    'v2-female-9': 'Gadesection9',
+    'male-1': 'Taesection1',
+    'male-2': 'Taesection2',
+    'male-3': 'Taesection3',
+    'male-4': 'Taesection4',
+    'male-5': 'Taesection5',
+    'male-6': 'Taesection6',
+    'male-7': 'Taesection7',
+    'male-8': 'Taesection8',
+    'male-9': 'Taesection9',
+    'female-1': 'Gadesection1',
+    'female-2': 'Gadesection2',
+    'female-3': 'Gadesection3',
+    'female-4': 'Gadesection4',
+    'female-5': 'Gadesection5',
+    'female-6': 'Gadesection6',
+    'female-7': 'Gadesection7',
+    'female-8': 'Gadesection8',
+    'female-9': 'Gadesection9',
   }
 
   constructor(options?: Partial<CharacterOptions>) {
