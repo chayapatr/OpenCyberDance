@@ -12,11 +12,11 @@ export class IframeBridge {
   constructor(private world: World) {}
 
   mount() {
-    // window.addEventListener('message', this.handler)
+    window.addEventListener('message', this.handler)
   }
 
   unmount() {
-    // window.removeEventListener('message', this.handler)
+    window.removeEventListener('message', this.handler)
   }
 
   // --- hooks called by world / switch-dance ---

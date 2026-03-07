@@ -5,14 +5,18 @@ import './main.css'
 import { devtools } from '@nanostores/vue/devtools'
 import { createApp } from 'vue'
 
-// @ts-expect-error - vue root import
-import App from './view/App.vue'
+import { getEmbedParams } from './embed-params'
 import { createIframeBridge } from './iframe-bridge'
+import App from './view/App.vue'
 import { world } from './world'
 
-const bridge = createIframeBridge(world)
-bridge.mount()
-world.bridge = bridge
+// Iframe bridge is only for external iframe integration.
+if (getEmbedParams().messageEnabled) {
+  const bridge = createIframeBridge(world)
+  bridge.mount()
+
+  world.bridge = bridge
+}
 
 export const app = createApp(App)
 app.use(devtools, {})

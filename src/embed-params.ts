@@ -7,6 +7,7 @@ interface EmbedParams {
   dancer: string | null
   cameraControl: boolean
   silenceDing: boolean
+  messageEnabled: boolean
 }
 
 export const getEmbedParams = (): EmbedParams => {
@@ -27,5 +28,6 @@ export const getEmbedParams = (): EmbedParams => {
     dancer: param.get('dancer'),
     cameraControl: check('camera_control'),
     silenceDing: check('silence_ding'),
+    messageEnabled: check('message'),
   }
 }

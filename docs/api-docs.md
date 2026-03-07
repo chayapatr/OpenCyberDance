@@ -5,19 +5,22 @@
 Pass these as query string parameters when embedding the app in an `<iframe>`.
 
 ```html
-<iframe src="https://example.com/?dancer=male:3&hide_ui=true&silence_ding=true"></iframe>
+<iframe
+  src="https://example.com/?dancer=male:3&hide_ui=true&silence_ding=true"
+></iframe>
 ```
 
-| Parameter           | Type    | Default | Description                                      |
-| ------------------- | ------- | ------- | ------------------------------------------------ |
+| Parameter           | Type    | Default | Description                                                      |
+| ------------------- | ------- | ------- | ---------------------------------------------------------------- |
 | `dancer`            | string  | —       | Initial dancer. Format: `male:1`–`male:9`, `female:1`–`female:9` |
-| `hide_ui`           | boolean | `false` | Hide the in-app command UI                       |
-| `camera_control`    | boolean | `false` | Enable user camera interaction                   |
-| `silence_ding`      | boolean | `false` | Mute audio dings                                 |
-| `speak`             | boolean | `false` | Enable text-to-speech output                     |
-| `listen`            | boolean | `false` | Enable voice recognition input                   |
-| `debug_status_line` | boolean | `false` | Show debug status line                           |
-| `debug_inspector`   | boolean | `false` | Show debug inspector panel                       |
+| `hide_ui`           | boolean | `false` | Hide the in-app command UI                                       |
+| `camera_control`    | boolean | `false` | Enable user camera interaction                                   |
+| `silence_ding`      | boolean | `false` | Mute audio dings                                                 |
+| `speak`             | boolean | `false` | Enable text-to-speech output                                     |
+| `listen`            | boolean | `false` | Enable voice recognition input                                   |
+| `message`           | boolean | `false` | Enable the postMessage API (disabled by default)                 |
+| `debug_status_line` | boolean | `false` | Show debug status line                                           |
+| `debug_inspector`   | boolean | `false` | Show debug inspector panel                                       |
 
 Boolean parameters accept `true` or `1`.
 
@@ -25,15 +28,19 @@ Boolean parameters accept `true` or `1`.
 
 ## postMessage API
 
+> **Requires `?message=1`** in the embed URL. The message handler is disabled by default.
+
 The embed accepts messages from the parent window and emits events back. All messages use structured
 JSON objects with a `type` field.
 
 **Sending to the embed:**
+
 ```js
 iframe.contentWindow.postMessage({ type: '...' }, '*')
 ```
 
 **Receiving from the embed:**
+
 ```js
 window.addEventListener('message', (e) => {
   if (e.data.type === '...') { ... }
@@ -97,7 +104,9 @@ Fine-grained animation parameter control. `percent` ranges match the in-app UI s
 Reset all animation parameters to their defaults.
 
 ```js
-{ type: 'reset' }
+{
+  type: 'reset'
+}
 ```
 
 ---
@@ -155,7 +164,9 @@ Fires whenever the active dancer changes (via postMessage or in-app UI).
 Fires when playback is paused.
 
 ```js
-{ type: 'animation:stopped' }
+{
+  type: 'animation:stopped'
+}
 ```
 
 ### `frame` _(stretch goal)_
@@ -172,7 +183,10 @@ One frame of the rendered canvas, emitted at the configured rate.
 ## Full Example
 
 ```html
-<iframe id="dancer" src="https://example.com/?hide_ui=true&silence_ding=true"></iframe>
+<iframe
+  id="dancer"
+  src="https://example.com/?hide_ui=true&silence_ding=true&message=1"
+></iframe>
 <canvas id="output"></canvas>
 
 <script>
@@ -181,9 +195,18 @@ One frame of the rendered canvas, emitted at the configured rate.
   const ctx = canvas.getContext('2d')
 
   // Select dancer and configure
-  iframe.contentWindow.postMessage({ type: 'dancer:select', dancer: 'female:3' }, '*')
-  iframe.contentWindow.postMessage({ type: 'param:energy', part: 'upper', percent: 150 }, '*')
-  iframe.contentWindow.postMessage({ type: 'transport:speed', percent: 80 }, '*')
+  iframe.contentWindow.postMessage(
+    { type: 'dancer:select', dancer: 'female:3' },
+    '*',
+  )
+  iframe.contentWindow.postMessage(
+    { type: 'param:energy', part: 'upper', percent: 150 },
+    '*',
+  )
+  iframe.contentWindow.postMessage(
+    { type: 'transport:speed', percent: 80 },
+    '*',
+  )
 
   // Stream frames at 30fps
   iframe.contentWindow.postMessage({ type: 'frame:start', mode: 30 }, '*')
