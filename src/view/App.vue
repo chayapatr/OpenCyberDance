@@ -27,6 +27,7 @@ const showPrompt = useStore($showPrompt)
 const dancesSelected = useStore($dancesSelected)
 
 const rendererElement = ref<HTMLDivElement>()
+const isLoading = ref(true)
 let show = () => {
   console.log('hello!')
 }
@@ -43,8 +44,8 @@ const selectDances = () => {
 const { hideUI, showDebugStatusLine, showDebugInspector } = getEmbedParams()
 
 onMounted(async () => {
-  await world.preload()
   await world.setup()
+  isLoading.value = false
 
   show = async () => {
     console.log('start')
@@ -212,6 +213,16 @@ onMounted(async () => {
     <div class="renderer-container" ref="rendererElement" />
 
     <!-- <div ref="plotterContainer" pointer-events-none /> -->
+
+    <div
+      v-if="isLoading"
+      class="fixed inset-0 flex items-center justify-center z-10"
+    >
+      <div class="flex flex-col items-center gap-3 text-white text-opacity-60">
+        <div class="w-8 h-8 border-2 border-white border-t-transparent rounded-full rotating" />
+        <span class="text-sm opacity-60">Loading...</span>
+      </div>
+    </div>
 
     <StepPrompt v-if="showPrompt && !hideUI" />
 

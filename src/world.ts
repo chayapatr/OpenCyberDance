@@ -30,7 +30,6 @@ import { dispose } from './dispose.ts'
 import { Params } from './overrides'
 import { Panel } from './panel'
 import { profile } from './perf'
-import { preloader } from './preloader.ts'
 import { updateDebugLogCamera } from './store/debug'
 import { $currentScene } from './store/scene.ts'
 import { changeAction, changeCharacter } from './switch-dance.ts'
@@ -696,10 +695,6 @@ export class World {
 
     // Fade in the blank scene.
     await world.fadeIn()
-  }
-
-  async preload() {
-    await preloader.setup()
   }
 
   async startShadowCharacter() {

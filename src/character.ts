@@ -11,6 +11,7 @@ import {
   SkeletonHelper,
   SkinnedMesh,
 } from 'three'
+import { SkeletonUtils } from 'three/examples/jsm/utils/SkeletonUtils.js'
 
 import { KeyframeAnalyzer } from './analyze'
 import { BoneRotationManager } from './bone-rotation'
@@ -306,7 +307,7 @@ export class Character {
       const source = Character.sources[config.model]
       if (source === 'none' || !source) return
 
-      const gltfModel = preloader.get(source)
+      const gltfModel = await preloader.getOrLoad(source)
       if (!gltfModel) return
 
       // Set the default actions.
