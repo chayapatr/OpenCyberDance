@@ -10,6 +10,8 @@ import {
   resetPrompt,
   $nonFinalNum,
   handleVoiceSelection,
+  $dancesSelected,
+  setChoice,
 } from '../store/choice'
 
 import { world } from '../world'
@@ -22,10 +24,19 @@ import { EndingKeyframes } from '../character'
 import { $currentScene } from '../store/scene'
 
 const showPrompt = useStore($showPrompt)
+const dancesSelected = useStore($dancesSelected)
 
 const rendererElement = ref<HTMLDivElement>()
 let show = () => {
   console.log("hello!")
+}
+
+const selectDances = () => {
+  resetPrompt()
+  setChoice('dances')
+  soundManager.play()
+  $showPrompt.set(true)
+  extendPromptTimeout('select dances', true)
 }
 // const plotterContainer = ref<HTMLDivElement>()
 
@@ -204,8 +215,11 @@ onMounted(async () => {
     <StageControl />
 
     <div class="fixed w-screen h-screen m-4">
-      <button @click="show" class="border-0 lg:text-4 bg-neutral-900 bg-black text-white px-4 py-2 hover:bg-neutral-800 hover:cursor-pointer">
-        Add Command
+      <button
+        @click="dancesSelected ? show() : selectDances()"
+        class="border-0 lg:text-4 bg-neutral-900 bg-black text-white px-4 py-2 hover:bg-neutral-800 hover:cursor-pointer"
+      >
+        {{ dancesSelected ? 'Add Command' : 'Select Dances' }}
       </button>
     </div>
   </div>

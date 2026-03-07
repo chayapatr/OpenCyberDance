@@ -14,6 +14,7 @@ export const $selectedValues = atom<string[]>([])
 export const $nonFinalNum = atom<number | null>(null)
 
 export const $showPrompt = atom(false)
+export const $dancesSelected = atom(false)
 export const $promptTimer = atom<number | null>(null)
 
 export const $selectedChoice = computed(
@@ -277,9 +278,6 @@ export function handleVoiceSelection(input: string | number): boolean {
     if (fix('x', /^(ex)$/i)) return true
     if (fix('y', /^(why|wine|whine)$/i)) return true
     if (fix('z', /^(see|sea)$/i)) return true
-    if (fix('kukpat', /^(tus|tusk|task|tas)/i)) return true
-    if (fix('yokroblingImprovise', /^(monkey|rob monkey)$/i)) return true
-    if (fix('number60', /^(number|six|sixty|number sixty)/i)) return true
   }
 
   if (currentStep.type === 'percent') {

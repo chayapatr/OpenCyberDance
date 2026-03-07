@@ -85,12 +85,7 @@ export type CharacterKey = keyof typeof Params.prototype.characters
 
 const NTH_FRAME_TICK = 58
 
-export const resetLimits: Partial<Record<ModelKey, number>> = {
-  poon: 160,
-  changhung: 300,
-  yokrob: 202,
-  yokroblingImprovise: 220,
-}
+export const resetLimits: Partial<Record<ModelKey, number>> = {}
 
 // Ending scene's keyframes
 export const EndingKeyframes = {}
@@ -121,7 +116,7 @@ type DebugSpheres = { forehead?: Mesh; neck?: Mesh; body?: Mesh }
 type AnimationFlags = object
 
 const DEBUG_SKELETON = false
-export const INITIAL_MODEL: ModelKey = 'waiting'
+export const INITIAL_MODEL: ModelKey = 'v2-male-1'
 
 export class Character {
   scene: THREE.Scene | null = null
@@ -144,7 +139,7 @@ export class Character {
   options: CharacterOptions = {
     name: 'first',
     action: '',
-    model: 'waiting',
+    model: 'v2-male-1',
     scale: 0.008,
     position: [0, 0, 0],
     lengthen: 0,
@@ -156,55 +151,49 @@ export class Character {
   static sources = {
     none: '',
 
-    // waiting: 'subinwaiting.glb',
-    waiting: 'Kukpat.glb',
-    // kukpat: 'Kukpat.glb',
-    terry: 'terry.glb',
-    // changhung: 'changhung.glb',
-    yokrob: 'yokrob.glb',
-    yokroblingImprovise: 'improvise.glb',
-
-    // Pichet dancers in ending scene.
-    // pichetMaster: 'Master.glb',
-    // pichetGenBlack: 'Gen.glb',
-
-    // robot: 'Robot3357test.glb',
-    // abstract: '3357modelidel.glb',
-    // abstract57: '575859_tas.glb',
-    // tranimid: 'tranimid.glb',
-
-    // black background
-    // padungLast: 'Padunglast.glb',
-    // terryLast: 'Terrylast.glb',
-    // tasLast: 'Taslast.glb',
-    // changhungLast: 'Changhonglast.glb',
+    // V2 models
+    'v2-male-1': 'v2-models/male-1.glb',
+    'v2-male-2': 'v2-models/male-2.glb',
+    'v2-male-3': 'v2-models/male-3.glb',
+    'v2-male-4': 'v2-models/male-4.glb',
+    'v2-male-5': 'v2-models/male-5.glb',
+    'v2-male-6': 'v2-models/male-6.glb',
+    'v2-male-7': 'v2-models/male-7.glb',
+    'v2-male-8': 'v2-models/male-8.glb',
+    'v2-male-9': 'v2-models/male-9.glb',
+    'v2-female-1': 'v2-models/female-1.glb',
+    'v2-female-2': 'v2-models/female-2.glb',
+    'v2-female-3': 'v2-models/female-3.glb',
+    'v2-female-4': 'v2-models/female-4.glb',
+    'v2-female-5': 'v2-models/female-5.glb',
+    'v2-female-6': 'v2-models/female-6.glb',
+    'v2-female-7': 'v2-models/female-7.glb',
+    'v2-female-8': 'v2-models/female-8.glb',
+    'v2-female-9': 'v2-models/female-9.glb',
   }
 
   static defaultActions: Record<ModelKey, string> = {
     none: '',
-    // abstract: 'no.33_.',
-    // robot: 'no.33_..001',
-    // abstract57: 'no57_Tas',
-    // kukpat: 'kukpat_Tas',
-    // tranimid: 'tranimid_Tas',
 
-    // animation track names for solo dances
-    terry: 'terry_chr02',
-    // changhung: 'Changhung002_chr02',
-    // yokrob: 'yokrobling_Tas',
-    yokroblingImprovise: 'yokroblingimprovised_chr02.001',
-
-    // waiting: 'sit002_Tas.001',
-    waiting: 'kukpat_Tas',
-    yokrob: 'yokrobling_Tas',
-
-    // pichetMaster: 'Master',
-    // pichetGenBlack: 'Action|Action|Action_Action_Action',
-
-    // padungLast: 'padungdance_Tas_padungdance_Tas',
-    // terryLast: 'Terrydance_Tas',
-    // changhungLast: 'Changhongdance_Tas_Changhongdance_Tas',
-    // tasLast: 'tasdance002_Tas',
+    // V2 models — fall back to first action
+    'v2-male-1': '',
+    'v2-male-2': '',
+    'v2-male-3': '',
+    'v2-male-4': '',
+    'v2-male-5': '',
+    'v2-male-6': '',
+    'v2-male-7': '',
+    'v2-male-8': '',
+    'v2-male-9': '',
+    'v2-female-1': '',
+    'v2-female-2': '',
+    'v2-female-3': '',
+    'v2-female-4': '',
+    'v2-female-5': '',
+    'v2-female-6': '',
+    'v2-female-7': '',
+    'v2-female-8': '',
+    'v2-female-9': '',
   }
 
   constructor(options?: Partial<CharacterOptions>) {

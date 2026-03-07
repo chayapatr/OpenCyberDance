@@ -36,7 +36,8 @@ export class ModelPreloader {
       const loader = new GLTFLoader()
       loader.setDRACOLoader(draco)
 
-      const model = await loader.loadAsync(`/models/${source}`)
+      const path = source.includes('/') ? `/${source}` : `/models/${source}`
+      const model = await loader.loadAsync(path)
 
       this.models.set(source, model)
 
