@@ -87,7 +87,28 @@ export type CharacterKey = keyof typeof Params.prototype.characters
 const NTH_FRAME_TICK = 58
 const HIPS_TRACK = 'mixamorigHips.position'
 
-export const resetLimits: Partial<Record<ModelKey, number>> = {}
+// End-frame limits at 24fps, converted to seconds (frames / 24).
+// Sections 1–8 share the same end frame for male and female; section 9 differs.
+export const resetLimits: Partial<Record<ModelKey, number>> = {
+  'male-1': 159.67,
+  'female-1': 159.67,
+  'male-2': 112,
+  'female-2': 112,
+  'male-3': 112.21,
+  'female-3': 112.21,
+  'male-4': 108.75,
+  'female-4': 108.75,
+  'male-5': 110.79,
+  'female-5': 110.79,
+  'male-6': 110.54,
+  'female-6': 110.54,
+  'male-7': 111.17,
+  'female-7': 111.17,
+  'male-8': 105.33,
+  'female-8': 105.33,
+  'male-9': 217.42,
+  'female-9': 216.21,
+}
 
 // Ending scene's keyframes
 export const EndingKeyframes = {}
