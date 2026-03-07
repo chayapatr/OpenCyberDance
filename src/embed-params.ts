@@ -1,6 +1,9 @@
 interface EmbedParams {
   speakEnabled: boolean
   listenEnabled: boolean
+  hideUI: boolean
+  showDebugStatusLine: boolean
+  showDebugInspector: boolean
 }
 
 export const getEmbedParams = (): EmbedParams => {
@@ -15,5 +18,8 @@ export const getEmbedParams = (): EmbedParams => {
   return {
     speakEnabled: check('speak'),
     listenEnabled: check('listen'),
+    hideUI: check('hide_ui'),
+    showDebugStatusLine: check('debug_status_line'),
+    showDebugInspector: check('debug_inspector'),
   }
 }

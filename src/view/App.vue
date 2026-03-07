@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { ref, onMounted, ReactiveFlags } from 'vue'
+import { ref, onMounted } from 'vue'
 import { useStore } from '@nanostores/vue'
 
 import {
@@ -17,11 +17,11 @@ import {
 import { world } from '../world'
 
 import StepPrompt from './StepPrompt.vue'
-import { ding, soundManager } from '../ding.ts'
+import { soundManager } from '../ding.ts'
 import StageControl from './StageControl.vue'
 
-import { EndingKeyframes } from '../character'
 import { $currentScene } from '../store/scene'
+import { getEmbedParams } from '../embed-params'
 
 const showPrompt = useStore($showPrompt)
 const dancesSelected = useStore($dancesSelected)
@@ -39,6 +39,8 @@ const selectDances = () => {
   extendPromptTimeout('select dances', true)
 }
 // const plotterContainer = ref<HTMLDivElement>()
+
+const { hideUI, showDebugStatusLine, showDebugInspector } = getEmbedParams()
 
 onMounted(async () => {
   await world.preload()
@@ -116,7 +118,7 @@ onMounted(async () => {
       }
     }
 
-    if (event.key === 'i') {
+    if (showDebugInspector && event.key === 'i') {
       if (world.panel.panel._hidden) {
         world.panel.panel.show(true)
       } else {
@@ -124,7 +126,7 @@ onMounted(async () => {
       }
     }
 
-    if (event.key === 'c') {
+    if (showDebugInspector && event.key === 'c') {
       world.setupControls()
     }
 
@@ -211,10 +213,11 @@ onMounted(async () => {
 
     <!-- <div ref="plotterContainer" pointer-events-none /> -->
 
-    <StepPrompt v-if="showPrompt" />
-    <StageControl />
+    <StepPrompt v-if="showPrompt && !hideUI" />
 
-    <div class="fixed w-screen h-screen m-4">
+    <StageControl v-if="showDebugStatusLine" />
+
+    <div class="fixed w-screen h-screen m-4" v-if="!hideUI">
       <button
         @click="dancesSelected ? show() : selectDances()"
         class="border-0 lg:text-4 bg-neutral-900 bg-black text-white px-4 py-2 hover:bg-neutral-800 hover:cursor-pointer"
