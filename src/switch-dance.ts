@@ -1,36 +1,14 @@
 import { Character, CharacterKey, ModelKey } from './character'
 import { world } from './world'
 
-export type DanceConfig = { model: ModelKey; action?: string }
-
-const danceKeyMap: Record<string, DanceConfig> = {
-  kukpat: { model: 'waiting' },
-  terry: { model: 'terry' },
-  changhung: { model: 'changhung' },
-  yokrob: { model: 'yokrob' },
-  yokroblingImprovise: {
-    model: 'yokroblingImprovise',
-    action: 'yokroblingimprovised_chr02.001',
-  },
-
-  // tranimid: { model: 'tranimid' },
-  // robot33: { model: 'robot', action: 'no.33_..001' },
-  // robot57: { model: 'robot', action: 'no.57_.' },
-  // base33: { model: 'abstract', action: 'no.33_.' },
-  // base57: { model: 'abstract57', action: 'no57_Tas' },
-  // base58: { model: 'abstract57', action: 'no58_Tas' },
-  // base59: { model: 'abstract57', action: 'no59_Tas' },
-}
-
 export async function switchDancers(key: string) {
-  const config = danceKeyMap[key]
-  if (!config) return
+  const v2Match = /^(male|female):([1-9])$/.exec(key)
+  if (!v2Match) return
 
-  const { model, action } = config
-  if (!model) return
+  const modelKey = `v2-${v2Match[1]}-${v2Match[2]}` as ModelKey
 
-  if (!Character.sources[model]) {
-    console.error(`model ${model} not found`)
+  if (!Character.sources[modelKey]) {
+    console.error(`v2 model ${modelKey} not found`)
     return
   }
 
@@ -39,11 +17,10 @@ export async function switchDancers(key: string) {
   for (const character of world.characters) {
     const name = character.options.name
 
-    character.options.model = model
-    world.params.characters[name].model = model
-
-    character.options.action = action ?? null
-    world.params.characters[name].action = action ?? null
+    character.options.model = modelKey
+    character.options.action = null
+    world.params.characters[name].model = modelKey
+    world.params.characters[name].action = null
 
     await changeCharacter(name)
   }

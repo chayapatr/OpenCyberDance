@@ -1,31 +1,27 @@
 import { DRACOLoader } from 'three/addons/loaders/DRACOLoader.js'
 import { GLTF, GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader'
 
-import { Character } from './character'
-
 export class ModelPreloader {
-  ready = false
   models: Map<string, GLTF> = new Map()
+  private pending: Map<string, Promise<GLTF | null>> = new Map()
 
-  public async setup() {
-    if (this.ready) return
+  public async getOrLoad(source: string): Promise<GLTF | null> {
+    const cached = this.models.get(source)
+    if (cached) return cached
 
-    const start = performance.now()
+    const inFlight = this.pending.get(source)
+    if (inFlight) return inFlight
 
-    const sources = Object.values(Character.sources).filter(
-      (src) => src && src.endsWith('.glb'),
-    )
+    const promise = this.load(source)
+    this.pending.set(source, promise)
 
-    console.log(`-- starting GLTF preload --`)
+    const result = await promise
+    this.pending.delete(source)
 
-    await Promise.all(sources.map((src) => this.load(src)))
-
-    console.log(`-- GLTF preload took ${performance.now() - start}ms`)
-
-    this.ready = true
+    return result
   }
 
-  private async load(source: string) {
+  private async load(source: string): Promise<GLTF | null> {
     try {
       const now = performance.now()
 
@@ -36,19 +32,19 @@ export class ModelPreloader {
       const loader = new GLTFLoader()
       loader.setDRACOLoader(draco)
 
-      const model = await loader.loadAsync(`/models/${source}`)
+      const path = source.includes('/') ? `/${source}` : `/models/${source}`
+      const model = await loader.loadAsync(path)
 
       this.models.set(source, model)
 
       const time = (performance.now() - now).toFixed(2)
-      console.log(`-- pre-loaded ${source} in ${time} --`)
+      console.log(`-- loaded ${source} in ${time}ms --`)
+
+      return model
     } catch (error) {
       console.error(`-- failed to load ${source} --`, error)
+      return null
     }
-  }
-
-  public get(source: string): GLTF | undefined {
-    return this.models.get(source)
   }
 }
 

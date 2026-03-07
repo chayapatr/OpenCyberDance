@@ -9,7 +9,7 @@ import {
   energyParts,
 } from './parts.ts'
 import { ChoiceKey, choices, Step } from './step-input'
-import { clearPromptTimeout } from './store/choice.ts'
+import { clearPromptTimeout, $dancesSelected } from './store/choice.ts'
 import { appendLog } from './store/status.ts'
 import { changeCharacter, switchDancers } from './switch-dance.ts'
 import { Axis } from './transforms.ts'
@@ -267,13 +267,15 @@ export async function runCommand(primary: ChoiceKey, args: string[]) {
   }
 
   if (primary === 'dances') {
-    const [dancerName] = args
+    const [gender, chapter] = args
 
-    console.log('switching dancer to', dancerName)
+    console.log('switching dancer to', gender, chapter)
 
     world.params.reset()
 
-    await switchDancers(dancerName)
+    await switchDancers(`${gender}:${chapter}`)
+
+    $dancesSelected.set(true)
 
     return
   }

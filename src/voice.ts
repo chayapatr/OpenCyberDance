@@ -1,3 +1,4 @@
+import { getEmbedParams } from './embed-params.ts'
 import { getMaxOccurence } from './math'
 import { Step } from './step-input.ts'
 import {
@@ -82,6 +83,8 @@ export class VoiceController {
 
     this.successFlags.clear()
 
+    if (!getEmbedParams().listenEnabled) return
+
     this.createRecognition()
 
     if (!this.recognition) return
@@ -119,6 +122,8 @@ export class VoiceController {
   }
 
   createRecognition() {
+    if (!getEmbedParams().listenEnabled) return
+
     this.recognition = new SpeechRecognition()
     this.recognition.lang = 'en-SG'
     this.recognition.interimResults = true
@@ -258,12 +263,16 @@ export class VoiceController {
         spokenText = spokenText.replace('rotations x', 'rotations ex')
       }
 
-      responsiveVoice.speak(spokenText, 'UK English Male', {
-        rate: 1,
-        onend: () => {
-          resolve()
-        },
-      })
+      if (getEmbedParams().speakEnabled) {
+        responsiveVoice.speak(spokenText, 'UK English Male', {
+          rate: 1,
+          onend: () => {
+            resolve()
+          },
+        })
+      } else {
+        resolve()
+      }
     })
   }
 

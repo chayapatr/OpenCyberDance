@@ -84,31 +84,31 @@ export const steps = {
     choices: [...armatureParts, ...toOptions('all')],
   },
 
-  dances: {
+  dancerGender: {
     type: 'choice',
     choices: [
-      { title: '1. kukpat', key: 'kukpat' },
-      // { title: '3. changhung', key: 'changhung' },
-      { title: '3. yokrob', key: 'yokrob' },
-      { title: '3. yokrob modern', key: 'yokroblingImprovise' },
-      { title: '4. freeform', key: 'terry' },
-      // { title: 'number 60', key: 'number60' },
-      // { title: '7. robot 33', key: 'robot33' },
-      // { title: '8. robot 57', key: 'robot57' },
-      // { title: '9. base 33', key: 'base33' },
-      // { title: '10. base 57', key: 'base57' },
-      // { title: '11. base 58', key: 'base58' },
-      // { title: '12. base 59', key: 'base59' },
-      // { title: '13. waiting', key: 'waiting' },
-      // { title: '11. unset', key: 'none' },
+      { title: 'Male (ตัวพระ)', key: 'male' },
+      { title: 'Female (ตัวนาง)', key: 'female' },
     ],
-    meta: 'ordered',
+  },
+
+  dancerChapter: {
+    type: 'choice',
+    choices: [1, 2, 3, 4, 5, 6, 7, 8, 9].map((n) => ({
+      title: `${n}`,
+      key: `${n}`,
+    })),
   },
 } satisfies Record<string, Step>
 
 export type StepKey = keyof typeof steps
 
 export const choices = {
+  dances: {
+    title: 'dances',
+    triggers: ['dances'],
+    steps: [steps.dancerGender, steps.dancerChapter],
+  },
   energy: {
     title: 'energy',
     triggers: ['energy'],
@@ -205,11 +205,6 @@ export const choices = {
     title: 'reset',
     triggers: ['reset'],
     steps: [],
-  },
-  dances: {
-    title: 'dances',
-    triggers: ['dances'],
-    steps: [steps.dances],
   },
 } satisfies Record<string, Choice>
 

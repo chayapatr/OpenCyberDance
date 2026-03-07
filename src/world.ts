@@ -23,14 +23,15 @@ import {
   Character,
   CharacterKey,
   CharacterOptions,
+  ModelKey,
   UpdateParamFlags,
 } from './character'
 import { soundManager } from './ding.ts'
 import { dispose } from './dispose.ts'
+import { getEmbedParams } from './embed-params'
 import { Params } from './overrides'
 import { Panel } from './panel'
 import { profile } from './perf'
-import { preloader } from './preloader.ts'
 import { updateDebugLogCamera } from './store/debug'
 import { $currentScene } from './store/scene.ts'
 import { changeAction, changeCharacter } from './switch-dance.ts'
@@ -319,24 +320,73 @@ export class World {
     )
   }
 
-  setupControls() {
+  setupDebugCameraControls() {
     if (!this.camera) return
 
     // Dispose existing controls
     if (this.controls) this.controls.dispose()
+    this._debugControlsAbort?.abort()
 
-    const controls = new OrbitControls(this.camera, this.renderer.domElement)
-    controls.enablePan = true
-    controls.enableZoom = true
-    controls.target.set(0, 0, 0)
-    controls.update()
+    const abort = new AbortController()
+    this._debugControlsAbort = abort
 
-    controls.addEventListener('change', () => {
-      updateDebugLogCamera(this.camera!)
-    })
+    window.addEventListener(
+      'wheel',
+      (e) => {
+        e.preventDefault()
+        if (!this.camera) return
+        const factor = e.deltaY > 0 ? 0.95 : 1.05
+        this.camera.zoom = Math.max(0.01, this.camera.zoom * factor)
+        this.camera.updateProjectionMatrix()
+        updateDebugLogCamera(this.camera)
+      },
+      { passive: false, signal: abort.signal },
+    )
 
-    this.controls = controls
+    let dragging = false
+    let lastX = 0
+    let lastY = 0
+
+    window.addEventListener(
+      'mousedown',
+      (e) => {
+        dragging = true
+        lastX = e.clientX
+        lastY = e.clientY
+      },
+      { signal: abort.signal },
+    )
+
+    window.addEventListener(
+      'mouseup',
+      () => {
+        dragging = false
+      },
+      { signal: abort.signal },
+    )
+
+    window.addEventListener(
+      'mousemove',
+      (e) => {
+        if (!dragging || !this.camera) return
+        const dx = e.clientX - lastX
+        const dy = e.clientY - lastY
+        lastX = e.clientX
+        lastY = e.clientY
+
+        // Scale pan speed by the visible frustum size
+        const scale =
+          CAMERA_FRUSTUM_SIZE / this.camera.zoom / window.innerHeight
+        this.camera.position.x -= dx * scale
+        this.camera.position.y += dy * scale
+
+        updateDebugLogCamera(this.camera)
+      },
+      { signal: abort.signal },
+    )
   }
+
+  private _debugControlsAbort: AbortController | null = null
 
   addResizeHandler() {
     window.addEventListener('resize', () => {
@@ -466,67 +516,18 @@ export class World {
 
     // Character in waiting mode
     if (scene === 'BLACK') {
+      const { dancer } = getEmbedParams()
+
+      const model: ModelKey =
+        dancer && dancer in Character.sources
+          ? (dancer as ModelKey)
+          : 'v2-male-1'
+
       await this.addCharacter({
         name: 'first',
         position: [0, 0, 0],
-        model: 'waiting',
+        model,
       })
-
-      return
-    }
-
-    // Add two characters
-    if (scene === 'ENDING') {
-      // padung ---------- terry | changhung | tas
-      await Promise.all([
-        this.addCharacter({
-          name: 'first',
-          position: [0, 0, 0],
-          model: 'padungLast',
-        }),
-
-        this.addCharacter({
-          name: 'second',
-          position: [0, 0, 0],
-          model: 'terryLast',
-        }),
-
-        this.addCharacter({
-          name: 'third',
-          position: [0, 0, 0],
-          model: 'changhungLast',
-        }),
-
-        this.addCharacter({
-          name: 'fourth',
-          position: [0, 0, 0],
-          model: 'tasLast',
-        }),
-      ])
-
-      this.params.characters.first = {
-        model: 'padungLast',
-        action: '',
-      }
-
-      this.params.characters.second = {
-        model: 'terryLast',
-        action: '',
-      }
-
-      if (!this.params.characters.third) {
-        this.params.characters.third = {
-          model: 'changhungLast',
-          action: '',
-        }
-      }
-
-      if (!this.params.characters.fourth) {
-        this.params.characters.fourth = {
-          model: 'tasLast',
-          action: '',
-        }
-      }
 
       return
     }
@@ -696,10 +697,6 @@ export class World {
 
     // Fade in the blank scene.
     await world.fadeIn()
-  }
-
-  async preload() {
-    await preloader.setup()
   }
 
   async startShadowCharacter() {
