@@ -338,7 +338,6 @@ export class World {
         const factor = e.deltaY > 0 ? 0.95 : 1.05
         this.camera.zoom = Math.max(0.01, this.camera.zoom * factor)
         this.camera.updateProjectionMatrix()
-        console.log(`[camera] zoom=${this.camera.zoom}`)
         updateDebugLogCamera(this.camera)
       },
       { passive: false, signal: abort.signal },
@@ -381,9 +380,6 @@ export class World {
         this.camera.position.x -= dx * scale
         this.camera.position.y += dy * scale
 
-        console.log(
-          `[camera] x=${this.camera.position.x} y=${this.camera.position.y}`,
-        )
         updateDebugLogCamera(this.camera)
       },
       { signal: abort.signal },
@@ -628,8 +624,6 @@ export class World {
 
     this.camera.rotation.set(...preset.rotation)
     this.camera.updateProjectionMatrix()
-
-    console.log(`[camera] preset=${presetKey} zoom=${this.camera.zoom}`)
 
     updateDebugLogCamera(this.camera)
   }
