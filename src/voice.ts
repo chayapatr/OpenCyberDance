@@ -82,7 +82,7 @@ export class VoiceController {
 
     this.successFlags.clear()
 
-    this.createRecognition()
+    // this.createRecognition()
 
     if (!this.recognition) return
 
