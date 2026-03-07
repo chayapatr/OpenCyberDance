@@ -23,10 +23,12 @@ import {
   Character,
   CharacterKey,
   CharacterOptions,
+  ModelKey,
   UpdateParamFlags,
 } from './character'
 import { soundManager } from './ding.ts'
 import { dispose } from './dispose.ts'
+import { getEmbedParams } from './embed-params'
 import { Params } from './overrides'
 import { Panel } from './panel'
 import { profile } from './perf'
@@ -318,15 +320,19 @@ export class World {
     )
   }
 
-  setupControls() {
+  setupDebugControls() {
     if (!this.camera) return
 
     // Dispose existing controls
     if (this.controls) this.controls.dispose()
+    this._debugControlsAbort?.abort()
+
+    const abort = new AbortController()
+    this._debugControlsAbort = abort
 
     const controls = new OrbitControls(this.camera, this.renderer.domElement)
     controls.enablePan = true
-    controls.enableZoom = true
+    controls.enableZoom = false
     controls.target.set(0, 0, 0)
     controls.update()
 
@@ -334,8 +340,23 @@ export class World {
       updateDebugLogCamera(this.camera!)
     })
 
+    window.addEventListener(
+      'wheel',
+      (e) => {
+        e.preventDefault()
+        if (!this.camera) return
+        const factor = e.deltaY > 0 ? 0.95 : 1.05
+        this.camera.zoom = Math.max(0.01, this.camera.zoom * factor)
+        this.camera.updateProjectionMatrix()
+        updateDebugLogCamera(this.camera)
+      },
+      { passive: false, signal: abort.signal },
+    )
+
     this.controls = controls
   }
+
+  private _debugControlsAbort: AbortController | null = null
 
   addResizeHandler() {
     window.addEventListener('resize', () => {
@@ -465,67 +486,18 @@ export class World {
 
     // Character in waiting mode
     if (scene === 'BLACK') {
+      const { dancer } = getEmbedParams()
+
+      const model: ModelKey =
+        dancer && dancer in Character.sources
+          ? (dancer as ModelKey)
+          : 'v2-male-1'
+
       await this.addCharacter({
         name: 'first',
         position: [0, 0, 0],
-        model: 'v2-male-1',
+        model,
       })
-
-      return
-    }
-
-    // Add two characters
-    if (scene === 'ENDING') {
-      // padung ---------- terry | changhung | tas
-      await Promise.all([
-        this.addCharacter({
-          name: 'first',
-          position: [0, 0, 0],
-          model: 'padungLast',
-        }),
-
-        this.addCharacter({
-          name: 'second',
-          position: [0, 0, 0],
-          model: 'terryLast',
-        }),
-
-        this.addCharacter({
-          name: 'third',
-          position: [0, 0, 0],
-          model: 'changhungLast',
-        }),
-
-        this.addCharacter({
-          name: 'fourth',
-          position: [0, 0, 0],
-          model: 'tasLast',
-        }),
-      ])
-
-      this.params.characters.first = {
-        model: 'padungLast',
-        action: '',
-      }
-
-      this.params.characters.second = {
-        model: 'terryLast',
-        action: '',
-      }
-
-      if (!this.params.characters.third) {
-        this.params.characters.third = {
-          model: 'changhungLast',
-          action: '',
-        }
-      }
-
-      if (!this.params.characters.fourth) {
-        this.params.characters.fourth = {
-          model: 'tasLast',
-          action: '',
-        }
-      }
 
       return
     }

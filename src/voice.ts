@@ -270,6 +270,8 @@ export class VoiceController {
             resolve()
           },
         })
+      } else {
+        resolve()
       }
     })
   }

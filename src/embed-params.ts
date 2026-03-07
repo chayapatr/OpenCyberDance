@@ -4,6 +4,7 @@ interface EmbedParams {
   hideUI: boolean
   showDebugStatusLine: boolean
   showDebugInspector: boolean
+  dancer: string | null
 }
 
 export const getEmbedParams = (): EmbedParams => {
@@ -21,5 +22,6 @@ export const getEmbedParams = (): EmbedParams => {
     hideUI: check('hide_ui'),
     showDebugStatusLine: check('debug_status_line'),
     showDebugInspector: check('debug_inspector'),
+    dancer: param.get('dancer'),
   }
 }

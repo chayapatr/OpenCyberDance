@@ -128,7 +128,7 @@ onMounted(async () => {
     }
 
     if (showDebugInspector && event.key === 'c') {
-      world.setupControls()
+      world.setupDebugControls()
     }
 
     // if (event.key === 'k') {
@@ -219,7 +219,9 @@ onMounted(async () => {
       class="fixed inset-0 flex items-center justify-center z-10"
     >
       <div class="flex flex-col items-center gap-3 text-white text-opacity-60">
-        <div class="w-8 h-8 border-2 border-white border-t-transparent rounded-full rotating" />
+        <div
+          class="w-8 h-8 border-2 border-white border-t-transparent rounded-full rotating"
+        />
         <span class="text-sm opacity-60">Loading...</span>
       </div>
     </div>
