@@ -29,6 +29,7 @@ import {
 import { soundManager } from './ding.ts'
 import { dispose } from './dispose.ts'
 import { getEmbedParams } from './embed-params'
+import type { IframeBridge } from './iframe-bridge'
 import { Params } from './overrides'
 import { Panel } from './panel'
 import { profile } from './perf'
@@ -65,6 +66,7 @@ export class World {
     powerPreference: 'high-performance',
     antialias: true,
     alpha: true,
+    preserveDrawingBuffer: true, // required for iframe frame capture
     // antialias: false,
     // stencil: false,
     // depth: false,
@@ -82,6 +84,8 @@ export class World {
 
   frontLight: DirectionalLight | null = null
   backLight: DirectionalLight | null = null
+
+  bridge: IframeBridge | null = null
 
   timers = { seekBar: 0 }
 
@@ -164,6 +168,8 @@ export class World {
 
     window.world = this
     this.ready = true
+
+    this.bridge?.onAnimationStarted(this.first?.options.model ?? '')
   }
 
   async transitionInEndingScene() {
@@ -227,6 +233,10 @@ export class World {
 
     if (this.camera) {
       this.renderer.render(this.scene, this.camera)
+    }
+
+    if (this.bridge?.isCapturing()) {
+      this.bridge.captureFrame(this.renderer.domElement)
     }
 
     requestAnimationFrame(this.render.bind(this))
@@ -589,6 +599,7 @@ export class World {
 
     this.panel.handlers.pause = (paused) => {
       paused ? this.clock.stop() : this.clock.start()
+      if (paused) this.bridge?.onAnimationStopped()
     }
 
     this.panel.handlers.prompt = () => {}

@@ -87,7 +87,11 @@ export const CurrentPercent = {
   axis: () => v2p('axis', world.params.axisPoint.frequency),
 }
 
-export async function runCommand(primary: ChoiceKey, args: string[]) {
+export async function runCommand(
+  primary: ChoiceKey,
+  args: string[],
+  opts: { silent?: boolean } = {},
+) {
   clearPromptTimeout()
   console.log(`executing command: ${primary} [${args.join(' ')}]`)
 
@@ -125,10 +129,12 @@ export async function runCommand(primary: ChoiceKey, args: string[]) {
 
   appendLog(spokenSentence)
 
-  world.voice.stop('run command done')
+  if (!opts.silent) {
+    world.voice.stop('run command done')
 
-  if (primary !== 'reset') {
-    await world.voice.speak(spokenSentence)
+    if (primary !== 'reset') {
+      await world.voice.speak(spokenSentence)
+    }
   }
 
   if (primary === 'curve') {

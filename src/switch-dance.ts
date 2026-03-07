@@ -26,6 +26,9 @@ export async function switchDancers(key: string) {
   }
 
   await world.fadeIn()
+
+  world.bridge?.onDancerSelect(key)
+  world.bridge?.onAnimationStarted(key)
 }
 
 export async function changeCharacter(name: CharacterKey) {

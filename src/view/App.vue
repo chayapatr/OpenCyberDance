@@ -22,9 +22,12 @@ import StageControl from './StageControl.vue'
 
 import { $currentScene } from '../store/scene'
 import { getEmbedParams } from '../embed-params'
+import { $cameraControl, $hideUI } from '../store/config'
 
 const showPrompt = useStore($showPrompt)
 const dancesSelected = useStore($dancesSelected)
+const hideUI = useStore($hideUI)
+const cameraControl = useStore($cameraControl)
 
 const rendererElement = ref<HTMLDivElement>()
 const isLoading = ref(true)
@@ -41,14 +44,13 @@ const selectDances = () => {
 }
 // const plotterContainer = ref<HTMLDivElement>()
 
-const { hideUI, showDebugStatusLine, showDebugInspector, cameraControl } =
-  getEmbedParams()
+const { showDebugStatusLine, showDebugInspector } = getEmbedParams()
 
 onMounted(async () => {
   await world.setup()
   isLoading.value = false
 
-  if (cameraControl) {
+  if (cameraControl.value) {
     world.setupDebugCameraControls()
   }
 
