@@ -157,13 +157,13 @@ onMounted(async () => {
       $currentScene.set('ENDING')
     }
 
-    if ((event.key === 'u' || event.key === 'ี') && event.ctrlKey) {
-      world.startShadowCharacter()
-    }
+    // if ((event.key === 'u' || event.key === 'ี') && event.ctrlKey) {
+    //   world.startShadowCharacter()
+    // }
 
-    if ((event.key === 'i' || event.key === 'ร') && event.ctrlKey) {
-      world.startDissolveCharacter()
-    }
+    // if ((event.key === 'i' || event.key === 'ร') && event.ctrlKey) {
+    //   world.startDissolveCharacter()
+    // }
 
     if (event.key === 'f' && event.ctrlKey) {
       if (!document.fullscreenElement) {
