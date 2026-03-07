@@ -89,6 +89,29 @@ Routes to `runCommand('reset', [])`.
 
 ---
 
+### `config`
+
+Toggle runtime embed options. All fields are optional — only provided fields are updated.
+
+```ts
+{
+  type: 'config',
+  hideUI?: boolean        // show/hide the in-app command UI
+  cameraControl?: boolean // enable/disable user camera interaction
+  silenceDing?: boolean   // mute/unmute audio dings
+}
+```
+
+These map directly to the existing `EmbedParams` flags in `embed-params.ts`.
+
+**Reactivity:** `hideUI` and `cameraControl` are currently read once at component init
+(`App.vue:44`). To support dynamic toggling, both must be converted from plain values to
+**nanostore atoms** (e.g. `$hideUI`, `$cameraControl`, `$silenceDing` in
+`src/store/config.ts`), initialized from `getEmbedParams()`. `App.vue` then uses
+`useStore($hideUI)` instead of the destructured constant, and `ding.ts` reads `$silenceDing.get()`.
+
+---
+
 ## Output Events (iframe → parent)
 
 ### `animation:started`
@@ -193,7 +216,24 @@ export function createIframeBridge(world: World): IframeBridge
 - `pause` handler when pausing → `this.bridge?.onAnimationStopped()`
 - In `render()` after `renderer.render(...)` → frame capture call (behind `isCapturing()` guard)
 
-### 3. `src/main.ts` — wire up
+### 3. `src/store/config.ts` — new reactive config store
+
+```ts
+import { atom } from 'nanostores'
+import { getEmbedParams } from '../embed-params'
+
+const p = getEmbedParams()
+export const $hideUI = atom<boolean>(p.hideUI)
+export const $cameraControl = atom<boolean>(p.cameraControl)
+export const $silenceDing = atom<boolean>(p.silenceDing)
+```
+
+- `App.vue` replaces `const { hideUI, cameraControl } = getEmbedParams()` with
+  `useStore($hideUI)` / `useStore($cameraControl)`
+- `ding.ts` replaces `getEmbedParams().silenceDing` with `$silenceDing.get()`
+- `iframe-bridge.ts` handles `config` by calling `$hideUI.set(...)` etc.
+
+### 4. `src/main.ts` — wire up
 
 ```ts
 const bridge = createIframeBridge(world)
@@ -230,6 +270,12 @@ type ParamRotationsMsg = {
   percent: number
 }
 type ResetMsg = { type: 'reset' }
+type ConfigMsg = {
+  type: 'config'
+  hideUI?: boolean
+  cameraControl?: boolean
+  silenceDing?: boolean
+}
 type FrameStartMsg = { type: 'frame:start'; mode: 'locked' | number }
 type FrameStopMsg = { type: 'frame:stop' }
 
@@ -243,6 +289,7 @@ type InboundMsg =
   | ParamAxisMsg
   | ParamRotationsMsg
   | ResetMsg
+  | ConfigMsg
   | FrameStartMsg
   | FrameStopMsg
 
