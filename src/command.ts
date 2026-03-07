@@ -9,7 +9,7 @@ import {
   energyParts,
 } from './parts.ts'
 import { ChoiceKey, choices, Step } from './step-input'
-import { clearPromptTimeout, $dancesSelected } from './store/choice.ts'
+import { $dancesSelected, clearPromptTimeout } from './store/choice.ts'
 import { appendLog } from './store/status.ts'
 import { changeCharacter, switchDancers } from './switch-dance.ts'
 import { Axis } from './transforms.ts'

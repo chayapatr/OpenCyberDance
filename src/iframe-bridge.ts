@@ -12,11 +12,11 @@ export class IframeBridge {
   constructor(private world: World) {}
 
   mount() {
-    window.addEventListener('message', this.handler)
+    // window.addEventListener('message', this.handler)
   }
 
   unmount() {
-    window.removeEventListener('message', this.handler)
+    // window.removeEventListener('message', this.handler)
   }
 
   // --- hooks called by world / switch-dance ---
@@ -96,7 +96,9 @@ export class IframeBridge {
         break
 
       case 'param:shifting':
-        runCommand('shifting', [msg.part, String(msg.percent)], { silent: true })
+        runCommand('shifting', [msg.part, String(msg.percent)], {
+          silent: true,
+        })
         break
 
       case 'param:space':
@@ -108,7 +110,9 @@ export class IframeBridge {
         break
 
       case 'param:rotations':
-        runCommand('rotations', [msg.axis, String(msg.percent)], { silent: true })
+        runCommand('rotations', [msg.axis, String(msg.percent)], {
+          silent: true,
+        })
         break
 
       case 'reset':
@@ -117,8 +121,10 @@ export class IframeBridge {
 
       case 'config':
         if (typeof msg.hideUI === 'boolean') $hideUI.set(msg.hideUI)
-        if (typeof msg.cameraControl === 'boolean') $cameraControl.set(msg.cameraControl)
-        if (typeof msg.silenceDing === 'boolean') $silenceDing.set(msg.silenceDing)
+        if (typeof msg.cameraControl === 'boolean')
+          $cameraControl.set(msg.cameraControl)
+        if (typeof msg.silenceDing === 'boolean')
+          $silenceDing.set(msg.silenceDing)
         break
 
       case 'frame:start':

@@ -3,7 +3,7 @@ import GUI from 'lil-gui'
 import { CAMERA_PRESETS } from './camera'
 import { Character, CharacterKey } from './character'
 import { Params } from './overrides'
-import { axisPointControlParts, DelayPartKey, EnergyPartKey } from './parts'
+import { DelayPartKey, EnergyPartKey } from './parts'
 import { transformers } from './transforms'
 
 interface Handlers {
