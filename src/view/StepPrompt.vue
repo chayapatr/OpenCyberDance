@@ -30,6 +30,7 @@ import {
 import { world } from '../world'
 import { $currentScene } from '../store/scene'
 import { $soundError, $soundReady, soundManager } from '../ding'
+import { getEmbedParams } from '../embed-params.ts'
 
 const selectedChoiceKey = useStore($selectedChoiceKey)
 const selectedChoice = useStore($selectedChoice)
@@ -40,6 +41,8 @@ const currentScene = useStore($currentScene)
 const selectedStepChoices = useStore($selectedValues)
 const completed = useStore($valueCompleted)
 const logs = useStore($logs)
+
+const { showDebugStatusLine } = getEmbedParams()
 
 const status = useStore($status)
 const transcript = useStore($transcript)
@@ -270,7 +273,7 @@ const soundState = computed(() => {
 
     <div v-if="transcript">h: {{ transcript?.slice(0, 60) }}</div>
 
-    <div v-if="time">
+    <div v-if="time && showDebugStatusLine">
       t: {{ time?.toFixed(2) }} / {{ duration?.toFixed(2) }} | ds:
       {{ soundState }}
       <span v-if="nonFinalNum !== null">| nfn: {{ nonFinalNum }}</span>
