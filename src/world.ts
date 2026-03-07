@@ -236,7 +236,7 @@ export class World {
     }
 
     if (this.bridge?.isCapturing()) {
-      this.bridge.captureFrame(this.renderer.domElement)
+      this.bridge?.captureFrame(this.renderer.domElement)
     }
 
     requestAnimationFrame(this.render.bind(this))
