@@ -137,8 +137,6 @@ export const clearMainChoice = () => {
   $selectedChoiceKey.set(null)
 }
 
-const choicesKey = Object.keys(choices)
-
 const selectChoice = (choice: ChoiceKey) => {
   setChoice(choice)
   // ding(2)
@@ -152,7 +150,7 @@ export function handleVoiceSelection(input: string | number): boolean {
   const currentStep = $currentStep.get() as Step
 
   if (!selectedChoiceKey || !currentStep) {
-    if (choicesKey.includes(input as string)) {
+    if (Object.keys(choices).includes(input as string)) {
       return selectChoice(input as ChoiceKey)
     }
 
