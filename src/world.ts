@@ -320,7 +320,7 @@ export class World {
     )
   }
 
-  setupDebugControls() {
+  setupDebugCameraControls() {
     if (!this.camera) return
 
     // Dispose existing controls

@@ -41,11 +41,16 @@ const selectDances = () => {
 }
 // const plotterContainer = ref<HTMLDivElement>()
 
-const { hideUI, showDebugStatusLine, showDebugInspector } = getEmbedParams()
+const { hideUI, showDebugStatusLine, showDebugInspector, cameraControl } =
+  getEmbedParams()
 
 onMounted(async () => {
   await world.setup()
   isLoading.value = false
+
+  if (cameraControl) {
+    world.setupDebugCameraControls()
+  }
 
   show = async () => {
     console.log('start')
@@ -128,7 +133,7 @@ onMounted(async () => {
     }
 
     if (showDebugInspector && event.key === 'c') {
-      world.setupDebugControls()
+      world.setupDebugCameraControls()
     }
 
     // if (event.key === 'k') {
