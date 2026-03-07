@@ -28,7 +28,7 @@ const dancesSelected = useStore($dancesSelected)
 
 const rendererElement = ref<HTMLDivElement>()
 let show = () => {
-  console.log("hello!")
+  console.log('hello!')
 }
 
 const selectDances = () => {
@@ -46,37 +46,37 @@ onMounted(async () => {
 
   show = async () => {
     console.log('start')
-      if (world.isEnding && world.flags.waitingEndingStart) {
-        return
-      }
+    if (world.isEnding && world.flags.waitingEndingStart) {
+      return
+    }
 
-      const willVisible = !showPrompt.value
+    const willVisible = !showPrompt.value
 
-      const completed = $valueCompleted.get()
+    const completed = $valueCompleted.get()
 
-      if (completed) {
-        soundManager.play()
-        // world.voice.enableVoice('prompt completed')
-        resetPrompt()
-        $showPrompt.set(true)
-
-        return
-      }
-
+    if (completed) {
+      soundManager.play()
+      // world.voice.enableVoice('prompt completed')
       resetPrompt()
+      $showPrompt.set(true)
 
-      if (willVisible) {
-        soundManager.play()
-        // world.voice.enableVoice('prompt activated')
-        $showPrompt.set(true)
+      return
+    }
 
-        // start the prompt timeout countdown
-        extendPromptTimeout('prompt activated', true)
-      } else {
-        world.voice.stop()
-        $showPrompt.set(false)
+    resetPrompt()
 
-        clearPromptTimeout('prompt deactivated')
+    if (willVisible) {
+      soundManager.play()
+      // world.voice.enableVoice('prompt activated')
+      $showPrompt.set(true)
+
+      // start the prompt timeout countdown
+      extendPromptTimeout('prompt activated', true)
+    } else {
+      world.voice.stop()
+      $showPrompt.set(false)
+
+      clearPromptTimeout('prompt deactivated')
     }
   }
 
@@ -116,17 +116,17 @@ onMounted(async () => {
       }
     }
 
-    // if (event.key === 'i') {
-    //   if (world.panel.panel._hidden) {
-    //     world.panel.panel.show(true)
-    //   } else {
-    //     world.panel.panel.hide()
-    //   }
-    // }
+    if (event.key === 'i') {
+      if (world.panel.panel._hidden) {
+        world.panel.panel.show(true)
+      } else {
+        world.panel.panel.hide()
+      }
+    }
 
-    // if (event.key === 'c') {
-    //   world.setupControls()
-    // }
+    if (event.key === 'c') {
+      world.setupControls()
+    }
 
     // if (event.key === 'k') {
     //   const cam = world.camera
@@ -223,5 +223,4 @@ onMounted(async () => {
       </button>
     </div>
   </div>
-
 </template>
