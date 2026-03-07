@@ -85,6 +85,7 @@ export type ModelKey = keyof typeof Character.sources
 export type CharacterKey = keyof typeof Params.prototype.characters
 
 const NTH_FRAME_TICK = 58
+const HIPS_TRACK = 'mixamorigHips.position'
 
 export const resetLimits: Partial<Record<ModelKey, number>> = {}
 
@@ -522,7 +523,7 @@ export class Character {
     if (!this.params || !this.params.lockPosition) return
 
     for (const track of clip.tracks) {
-      if (track.name !== 'Hips.position') continue
+      if (track.name !== HIPS_TRACK) continue
 
       if (!position) {
         track.values.fill(0)
@@ -550,7 +551,7 @@ export class Character {
     if (!sources) return
 
     clip.tracks.forEach((track, index) => {
-      if (track.name !== 'Hips.position') return
+      if (track.name !== HIPS_TRACK) return
 
       track.values = sources[index].values
     })

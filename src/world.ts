@@ -330,16 +330,6 @@ export class World {
     const abort = new AbortController()
     this._debugControlsAbort = abort
 
-    const controls = new OrbitControls(this.camera, this.renderer.domElement)
-    controls.enablePan = true
-    controls.enableZoom = false
-    controls.target.set(0, 0, 0)
-    controls.update()
-
-    controls.addEventListener('change', () => {
-      updateDebugLogCamera(this.camera!)
-    })
-
     window.addEventListener(
       'wheel',
       (e) => {
@@ -348,12 +338,56 @@ export class World {
         const factor = e.deltaY > 0 ? 0.95 : 1.05
         this.camera.zoom = Math.max(0.01, this.camera.zoom * factor)
         this.camera.updateProjectionMatrix()
+        console.log(`[camera] zoom=${this.camera.zoom}`)
         updateDebugLogCamera(this.camera)
       },
       { passive: false, signal: abort.signal },
     )
 
-    this.controls = controls
+    let dragging = false
+    let lastX = 0
+    let lastY = 0
+
+    window.addEventListener(
+      'mousedown',
+      (e) => {
+        dragging = true
+        lastX = e.clientX
+        lastY = e.clientY
+      },
+      { signal: abort.signal },
+    )
+
+    window.addEventListener(
+      'mouseup',
+      () => {
+        dragging = false
+      },
+      { signal: abort.signal },
+    )
+
+    window.addEventListener(
+      'mousemove',
+      (e) => {
+        if (!dragging || !this.camera) return
+        const dx = e.clientX - lastX
+        const dy = e.clientY - lastY
+        lastX = e.clientX
+        lastY = e.clientY
+
+        // Scale pan speed by the visible frustum size
+        const scale =
+          CAMERA_FRUSTUM_SIZE / this.camera.zoom / window.innerHeight
+        this.camera.position.x -= dx * scale
+        this.camera.position.y += dy * scale
+
+        console.log(
+          `[camera] x=${this.camera.position.x} y=${this.camera.position.y}`,
+        )
+        updateDebugLogCamera(this.camera)
+      },
+      { signal: abort.signal },
+    )
   }
 
   private _debugControlsAbort: AbortController | null = null
@@ -594,6 +628,8 @@ export class World {
 
     this.camera.rotation.set(...preset.rotation)
     this.camera.updateProjectionMatrix()
+
+    console.log(`[camera] preset=${presetKey} zoom=${this.camera.zoom}`)
 
     updateDebugLogCamera(this.camera)
   }
