@@ -603,6 +603,12 @@ export class Character {
           const original = this.originalOf(index)
           if (!original) return
 
+          // Skip restoring Hips.position when position is locked,
+          // otherwise the character walks out of the camera viewport.
+          if (this.params?.lockPosition && track.name === 'Hips.position') {
+            return
+          }
+
           // clear the altered track, please.
           track.values = original.values.slice(0)
         })
