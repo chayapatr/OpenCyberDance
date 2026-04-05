@@ -605,7 +605,7 @@ export class Character {
 
           // Skip restoring Hips.position when position is locked,
           // otherwise the character walks out of the camera viewport.
-          if (this.params?.lockPosition && track.name === 'Hips.position') {
+          if (this.params?.lockPosition && track.name === HIPS_TRACK) {
             return
           }
 
@@ -663,7 +663,7 @@ export class Character {
 
       // Reset the keyframe values when circle and curve formula changes.
       if (flags.curve || flags.axisPoint) {
-        if (this.params.lockPosition && track.name !== 'Hips.position') {
+        if (this.params.lockPosition && track.name !== HIPS_TRACK) {
           // Apply the existing keyframe values to all tracks.
           track.values = original.values.slice(0)
         }

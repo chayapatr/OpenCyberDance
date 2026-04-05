@@ -405,7 +405,8 @@ export function applyExternalBodySpace(
     // apply it to rotations and hips position
     // ! character will float in the air if hips position is not adjusted
     const isTargetTrack =
-      track instanceof QuaternionKeyframeTrack || track.name === 'Hips.position'
+      track instanceof QuaternionKeyframeTrack ||
+      track.name === 'mixamorigHips.position'
 
     if (!isTargetTrack) return
 
