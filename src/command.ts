@@ -8,6 +8,7 @@ import {
   EnergyPartKey,
   energyParts,
 } from './parts.ts'
+import { curveThresholdRange } from './ranges.ts'
 import { ChoiceKey, choices, Step } from './step-input'
 import { $dancesSelected, clearPromptTimeout } from './store/choice.ts'
 import { appendLog } from './store/status.ts'
@@ -25,7 +26,7 @@ const rangeConfig: Record<
   [min: number, max: number, maxPerc?: number]
 > = {
   energy: [0, 1, 300],
-  curve: [-2, 3],
+  curve: [curveThresholdRange.min, curveThresholdRange.max],
   shifting: [0, 100],
   space: [0, 1.5],
   rotations: [1, 3.5],

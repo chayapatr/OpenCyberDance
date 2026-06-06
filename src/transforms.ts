@@ -1,6 +1,8 @@
 import * as THREE from 'three'
 import { KeyframeTrack, Quaternion, QuaternionKeyframeTrack } from 'three'
 
+import { curveThresholdRange } from './ranges.ts'
+
 export type Axis = 'x' | 'y' | 'z'
 export type QAxis = Axis | 'w'
 
@@ -261,8 +263,18 @@ type FormulaRange = [min: number, max: number, step: number, initial: number]
 const rWindow: FormulaRange = [1, 2000, 1, 1]
 
 export const formulaRanges = {
-  capMin: [-2, 3, 0.01, 0.1],
-  capMax: [-2, 3, 0.01, 0.1],
+  capMin: [
+    curveThresholdRange.min,
+    curveThresholdRange.max,
+    curveThresholdRange.step,
+    curveThresholdRange.initial,
+  ],
+  capMax: [
+    curveThresholdRange.min,
+    curveThresholdRange.max,
+    curveThresholdRange.step,
+    curveThresholdRange.initial,
+  ],
   lowpass: rWindow,
   highpass: rWindow,
   gaussian: rWindow,
