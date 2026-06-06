@@ -224,6 +224,8 @@ const soundState = computed(() => {
               v-for="i in currentStep.max
                 ? currentStep.max === 300
                   ? [0, 25, 50, 100, 150, 200, 300]
+                  : currentStep.max === 150
+                    ? [0, 25, 50, 75, 100, 125, 150]
                   : [0, 20, 40, 60, 80, 100, 120]
                 : [0, 25, 50, 75, 100]"
               :key="i"

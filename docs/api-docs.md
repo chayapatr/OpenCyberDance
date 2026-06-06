@@ -85,7 +85,7 @@ Fine-grained animation parameter control. `percent` ranges match the in-app UI s
 { type: 'param:curve', part: 'body' | 'leftArm' | 'rightArm' | 'leftLeg' | 'rightLeg' | 'all', percent: number } // 0–100
 
 // Shifting relations — offsets animation timing per limb group
-{ type: 'param:shifting', part: 'left' | 'right' | 'body', percent: number } // 0–100
+{ type: 'param:shifting', part: 'left' | 'right' | 'body', percent: number } // 0–150
 
 // External body space — modulates overall movement amplitude
 { type: 'param:space', percent: number } // 0–100

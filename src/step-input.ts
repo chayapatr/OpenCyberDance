@@ -1,5 +1,6 @@
 import { CurrentPercent } from './command.ts'
 import { DelayPartKey, EnergyPartKey } from './parts.ts'
+import { shiftingDelayRange } from './ranges.ts'
 import { $selectedValues } from './store/choice.ts'
 import { Axis } from './transforms.ts'
 
@@ -144,6 +145,7 @@ export const choices = {
       steps.shiftingParts,
       {
         type: 'percent',
+        max: shiftingDelayRange.maxPercent,
         current() {
           const values = $selectedValues.get()
 

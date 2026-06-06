@@ -4,6 +4,7 @@ import { CAMERA_PRESETS } from './camera'
 import { Character, CharacterKey } from './character'
 import { Params } from './overrides'
 import { DelayPartKey, EnergyPartKey } from './parts'
+import { shiftingDelayRange } from './ranges'
 import { transformers } from './transforms'
 
 interface Handlers {
@@ -94,7 +95,13 @@ export class Panel {
   addDelay(...parts: DelayPartKey[]) {
     for (const part of parts) {
       this.delayFolder
-        ?.add(this.params.delays, part, 0, 100, 0.01)
+        ?.add(
+          this.params.delays,
+          part,
+          shiftingDelayRange.min,
+          shiftingDelayRange.maxPercent,
+          shiftingDelayRange.step,
+        )
         .listen()
         .onChange(this.handlers.delay)
     }

@@ -58,7 +58,7 @@ ranges as the UI.
 
 { type: 'param:shifting',
   part: 'left' | 'right' | 'body',
-  percent: number }                          // 0–100
+  percent: number }                          // 0–150
 
 { type: 'param:space',
   percent: number }                          // 0–100
