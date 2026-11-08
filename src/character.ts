@@ -13,6 +13,7 @@ import {
 } from 'three'
 
 import { KeyframeAnalyzer } from './analyze'
+import { animationFrameRanges } from './animation'
 import { BoneRotationManager } from './bone-rotation'
 import { CameraPresetKey } from './camera'
 import { dispose } from './dispose'
@@ -86,29 +87,14 @@ export type CharacterKey = keyof typeof Params.prototype.characters
 const NTH_FRAME_TICK = 58
 const ROOT_POSITION_TRACKS = new Set(['Hips.position', 'Reference.position'])
 
-// End frames from Chapters 1-end.xlsx, recorded at 25 fps.
-export const resetLimits: Partial<Record<ModelKey, number>> = {
-  'male-1': 3900 / 25,
-  'female-1': 3900 / 25,
-  'male-2': 2600 / 25,
-  'female-2': 2600 / 25,
-  'male-3': 2600 / 25,
-  'female-3': 2600 / 25,
-  'male-4': 2600 / 25,
-  'female-4': 2600 / 25,
-  'male-5': 2560 / 25,
-  'female-5': 2560 / 25,
-  'male-6': 2530 / 25,
-  'female-6': 2530 / 25,
-  'male-7': 2540 / 25,
-  'female-7': 2540 / 25,
-  'male-8': 2420 / 25,
-  'female-8': 2420 / 25,
-  'male-9': 2546 / 25,
-  'female-9': 2546 / 25,
-  'male-end': 2300 / 25,
-  'female-end': 2300 / 25,
-}
+// Playback limits on the trimmed timeline, at 25 fps.
+export const resetLimits: Partial<Record<ModelKey, number>> =
+  Object.fromEntries(
+    Object.entries(animationFrameRanges).map(([source, { start, end }]) => [
+      source.slice('v2-models/'.length, -'.glb'.length),
+      (end - start) / 25,
+    ]),
+  )
 
 // Ending scene's keyframes
 export const EndingKeyframes = {}
@@ -436,6 +422,8 @@ export class Character {
 
       // Play the first animation
       this.updateAction()
+      // Apply the first animated pose before the model becomes visible.
+      this.mixer.update(0)
 
       // Initialize bone rotation manager
       this.boneRotation = new BoneRotationManager(this)

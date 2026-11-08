@@ -1,6 +1,8 @@
 import { DRACOLoader } from 'three/addons/loaders/DRACOLoader.js'
 import { GLTF, GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader'
 
+import { animationFrameRanges, trimAnimation } from './animation'
+
 export class ModelPreloader {
   models: Map<string, GLTF> = new Map()
   private pending: Map<string, Promise<GLTF | null>> = new Map()
@@ -34,6 +36,13 @@ export class ModelPreloader {
 
       const path = source.includes('/') ? `/${source}` : `/models/${source}`
       const model = await loader.loadAsync(path)
+
+      const range = animationFrameRanges[source]
+      if (range) {
+        model.animations = model.animations.map((clip) =>
+          trimAnimation(clip, range.start / 25, range.end / 25),
+        )
+      }
 
       this.models.set(source, model)
 
