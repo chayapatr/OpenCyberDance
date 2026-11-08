@@ -11,7 +11,6 @@ import {
   SkeletonHelper,
   SkinnedMesh,
 } from 'three'
-import { SkeletonUtils } from 'three/examples/jsm/utils/SkeletonUtils.js'
 
 import { KeyframeAnalyzer } from './analyze'
 import { BoneRotationManager } from './bone-rotation'
@@ -85,29 +84,30 @@ export type ModelKey = keyof typeof Character.sources
 export type CharacterKey = keyof typeof Params.prototype.characters
 
 const NTH_FRAME_TICK = 58
-const HIPS_TRACK = 'mixamorigHips.position'
+const ROOT_POSITION_TRACKS = new Set(['Hips.position', 'Reference.position'])
 
-// End-frame limits at 24fps, converted to seconds (frames / 24).
-// Sections 1–8 share the same end frame for male and female; section 9 differs.
+// End frames from Chapters 1-end.xlsx, recorded at 25 fps.
 export const resetLimits: Partial<Record<ModelKey, number>> = {
-  'male-1': 159.67,
-  'female-1': 159.67,
-  'male-2': 112,
-  'female-2': 112,
-  'male-3': 112.21,
-  'female-3': 112.21,
-  'male-4': 108.75,
-  'female-4': 108.75,
-  'male-5': 110.79,
-  'female-5': 110.79,
-  'male-6': 110.54,
-  'female-6': 110.54,
-  'male-7': 111.17,
-  'female-7': 111.17,
-  'male-8': 105.33,
-  'female-8': 105.33,
-  'male-9': 217.42,
-  'female-9': 216.21,
+  'male-1': 3900 / 25,
+  'female-1': 3900 / 25,
+  'male-2': 2600 / 25,
+  'female-2': 2600 / 25,
+  'male-3': 2600 / 25,
+  'female-3': 2600 / 25,
+  'male-4': 2600 / 25,
+  'female-4': 2600 / 25,
+  'male-5': 2560 / 25,
+  'female-5': 2560 / 25,
+  'male-6': 2530 / 25,
+  'female-6': 2530 / 25,
+  'male-7': 2540 / 25,
+  'female-7': 2540 / 25,
+  'male-8': 2420 / 25,
+  'female-8': 2420 / 25,
+  'male-9': 2546 / 25,
+  'female-9': 2546 / 25,
+  'male-end': 2300 / 25,
+  'female-end': 2300 / 25,
 }
 
 // Ending scene's keyframes
@@ -183,6 +183,7 @@ export class Character {
     'male-7': 'v2-models/male-7.glb',
     'male-8': 'v2-models/male-8.glb',
     'male-9': 'v2-models/male-9.glb',
+    'male-end': 'v2-models/male-end.glb',
     'female-1': 'v2-models/female-1.glb',
     'female-2': 'v2-models/female-2.glb',
     'female-3': 'v2-models/female-3.glb',
@@ -192,29 +193,34 @@ export class Character {
     'female-7': 'v2-models/female-7.glb',
     'female-8': 'v2-models/female-8.glb',
     'female-9': 'v2-models/female-9.glb',
+    'female-end': 'v2-models/female-end.glb',
   }
 
   static defaultActions: Record<ModelKey, string> = {
     none: '',
 
-    'male-1': 'Taesection1',
-    'male-2': 'Taesection2',
-    'male-3': 'Taesection3',
-    'male-4': 'Taesection4',
-    'male-5': 'Taesection5',
-    'male-6': 'Taesection6',
-    'male-7': 'Taesection7',
-    'male-8': 'Taesection8',
-    'male-9': 'Taesection9',
-    'female-1': 'Gadesection1',
-    'female-2': 'Gadesection2',
-    'female-3': 'Gadesection3',
-    'female-4': 'Gadesection4',
-    'female-5': 'Gadesection5',
-    'female-6': 'Gadesection6',
-    'female-7': 'Gadesection7',
-    'female-8': 'Gadesection8',
-    'female-9': 'Gadesection9',
+    'male-1': 'Skeletons|MAE_BOD_YAI_CHAPTER_1_TK0001_TAE_remap',
+    'male-2': 'Skeletons|MAE_BOD_YAI_CHAPTER_2_TK0001_TAE_remap.001',
+    'male-3': 'Skeletons|MAE_BOD_YAI_CHAPTER_3_TK0001_TAE_remap.001',
+    'male-4': 'Skeletons|MAE_BOD_YAI_CHAPTER_4_TK0001_TAE_remap.001',
+    'male-5': 'Skeletons|MAE_BOD_YAI_CHAPTER_5_TK0002_TAE_remap.001',
+    'male-6': 'Skeletons|MAE_BOD_YAI_CHAPTER_6_TK0001_TAE_remap.001',
+    // Malechp7.glb retains a chapter 6 name inside the source file.
+    'male-7': 'Skeletons|MAE_BOD_YAI_CHAPTER_6_TK0001_TAE_remap.001',
+    'male-8': 'Skeletons|MAE_BOD_YAI_CHAPTER_8_TK0001_TAE_remap.001',
+    'male-9': 'Skeletons|MAE_BOD_YAI_CHAPTER_9_TK0001_TAE_remap.001',
+    'male-end': 'Skeletons|MAE_BOD_YAI_END_TK0001_TAE_remap.001',
+    'female-1': 'Skeletons|MAE_BOD_YAI_CHAPTER_1_TK0001_GADE_remap.001',
+    'female-2': 'Skeletons|MAE_BOD_YAI_CHAPTER_2_TK0001_GADE_remap.001',
+    // Femalechp3.glb retains a chapter 4 name inside the source file.
+    'female-3': 'Skeletons|MAE_BOD_YAI_CHAPTER_4_TK0001_GADE_remap.001',
+    'female-4': 'Skeletons|MAE_BOD_YAI_CHAPTER_4_TK0001_GADE_remap.001',
+    'female-5': 'Skeletons|MAE_BOD_YAI_CHAPTER_5_TK0002_GADE_remap.001',
+    'female-6': 'Skeletons|MAE_BOD_YAI_CHAPTER_6_TK0001_GADE_remap.001',
+    'female-7': 'Skeletons|MAE_BOD_YAI_CHAPTER_7_TK0001_GADE_remap.001',
+    'female-8': 'Skeletons|MAE_BOD_YAI_CHAPTER_8_TK0001_GADE_remap.001',
+    'female-9': 'Skeletons|MAE_BOD_YAI_CHAPTER_9_TK0001_GADE_remap.001',
+    'female-end': 'Skeletons|MAE_BOD_YAI_END_TK0001_GADE_remap.001',
   }
 
   constructor(options?: Partial<CharacterOptions>) {
@@ -542,11 +548,12 @@ export class Character {
     if (!this.params || !this.params.lockPosition) return
 
     for (const track of clip.tracks) {
-      if (track.name !== HIPS_TRACK) continue
+      if (!ROOT_POSITION_TRACKS.has(track.name)) continue
 
-      if (!position) {
+      // Female exports also have an offset on the parent Reference bone.
+      if (!position || track.name === 'Reference.position') {
         track.values.fill(0)
-        break
+        continue
       }
 
       for (let i = 0; i < track.values.length; i += 3) {
@@ -554,8 +561,6 @@ export class Character {
         track.values[i + 1] = position[1]
         track.values[i + 2] = position[2]
       }
-
-      break
     }
   }
 
@@ -570,7 +575,7 @@ export class Character {
     if (!sources) return
 
     clip.tracks.forEach((track, index) => {
-      if (track.name !== HIPS_TRACK) return
+      if (!ROOT_POSITION_TRACKS.has(track.name)) return
 
       track.values = sources[index].values
     })
@@ -603,9 +608,12 @@ export class Character {
           const original = this.originalOf(index)
           if (!original) return
 
-          // Skip restoring Hips.position when position is locked,
+          // Skip restoring root positions when position is locked,
           // otherwise the character walks out of the camera viewport.
-          if (this.params?.lockPosition && track.name === HIPS_TRACK) {
+          if (
+            this.params?.lockPosition &&
+            ROOT_POSITION_TRACKS.has(track.name)
+          ) {
             return
           }
 
@@ -663,7 +671,7 @@ export class Character {
 
       // Reset the keyframe values when circle and curve formula changes.
       if (flags.curve || flags.axisPoint) {
-        if (this.params.lockPosition && track.name !== HIPS_TRACK) {
+        if (this.params.lockPosition && !ROOT_POSITION_TRACKS.has(track.name)) {
           // Apply the existing keyframe values to all tracks.
           track.values = original.values.slice(0)
         }
