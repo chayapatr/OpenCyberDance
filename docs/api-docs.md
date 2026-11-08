@@ -10,17 +10,17 @@ Pass these as query string parameters when embedding the app in an `<iframe>`.
 ></iframe>
 ```
 
-| Parameter           | Type    | Default | Description                                                      |
-| ------------------- | ------- | ------- | ---------------------------------------------------------------- |
-| `dancer`            | string  | —       | Initial dancer. Format: `male:1`–`male:9`, `female:1`–`female:9` |
-| `hide_ui`           | boolean | `false` | Hide the in-app command UI                                       |
-| `camera_control`    | boolean | `false` | Enable user camera interaction                                   |
-| `silence_ding`      | boolean | `false` | Mute audio dings                                                 |
-| `speak`             | boolean | `false` | Enable text-to-speech output                                     |
-| `listen`            | boolean | `false` | Enable voice recognition input                                   |
-| `message`           | boolean | `false` | Enable the postMessage API (disabled by default)                 |
-| `debug_status_line` | boolean | `false` | Show debug status line                                           |
-| `debug_inspector`   | boolean | `false` | Show debug inspector panel                                       |
+| Parameter           | Type    | Default | Description                                                                                |
+| ------------------- | ------- | ------- | ------------------------------------------------------------------------------------------ |
+| `dancer`            | string  | —       | Initial dancer. Format: `male:1`–`male:9`, `female:1`–`female:9`, `male:end`, `female:end` |
+| `hide_ui`           | boolean | `false` | Hide the in-app command UI                                                                 |
+| `camera_control`    | boolean | `false` | Enable user camera interaction                                                             |
+| `silence_ding`      | boolean | `false` | Mute audio dings                                                                           |
+| `speak`             | boolean | `false` | Enable text-to-speech output                                                               |
+| `listen`            | boolean | `false` | Enable voice recognition input                                                             |
+| `message`           | boolean | `false` | Enable the postMessage API (disabled by default)                                           |
+| `debug_status_line` | boolean | `false` | Show debug status line                                                                     |
+| `debug_inspector`   | boolean | `false` | Show debug inspector panel                                                                 |
 
 Boolean parameters accept `true` or `1`.
 
@@ -57,7 +57,7 @@ Load and play a dancer model.
 
 ```js
 { type: 'dancer:select', dancer: 'male:3' }
-// dancer: 'male:1'–'male:9' | 'female:1'–'female:9'
+// dancer: 'male:1'–'male:9' | 'female:1'–'female:9' | 'male:end' | 'female:end'
 ```
 
 ---

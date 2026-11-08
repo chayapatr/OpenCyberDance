@@ -526,7 +526,7 @@ export class World {
 
     // Character in waiting mode
     if (scene === 'BLACK') {
-      const { dancer } = getEmbedParams()
+      const dancer = getEmbedParams().dancer?.replace(':', '-')
 
       const model: ModelKey =
         dancer && dancer in Character.sources ? (dancer as ModelKey) : 'male-1'

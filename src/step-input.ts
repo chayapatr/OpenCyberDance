@@ -95,8 +95,8 @@ export const steps = {
 
   dancerChapter: {
     type: 'choice',
-    choices: [1, 2, 3, 4, 5, 6, 7, 8, 9].map((n) => ({
-      title: `${n}`,
+    choices: [1, 2, 3, 4, 5, 6, 7, 8, 9, 'end'].map((n) => ({
+      title: n === 'end' ? 'END' : `${n}`,
       key: `${n}`,
     })),
   },

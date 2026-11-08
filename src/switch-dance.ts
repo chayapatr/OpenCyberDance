@@ -2,7 +2,7 @@ import { Character, CharacterKey, ModelKey } from './character'
 import { world } from './world'
 
 export async function switchDancers(key: string) {
-  const v2Match = /^(male|female):([1-9])$/.exec(key)
+  const v2Match = /^(male|female):([1-9]|end)$/.exec(key)
   if (!v2Match) return
 
   const modelKey = `${v2Match[1]}-${v2Match[2]}` as ModelKey
