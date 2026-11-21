@@ -11,7 +11,11 @@ import {
 } from 'three'
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
 
-import { animationFrameRanges, trimAnimation } from '../src/animation.ts'
+import {
+  animationFrameRanges,
+  MOCAP_FPS,
+  trimAnimation,
+} from '../src/animation.ts'
 
 test('trimming preserves interpolated and constant tracks and loops on the new timeline', () => {
   const clip = new AnimationClip('dance', 10, [
@@ -54,17 +58,33 @@ test('all 20 files start outside the recorded T-pose and retain every track', as
       '',
     )
     const clip = gltf.animations[0]
-    const trimmed = trimAnimation(clip, start / 25, end / 25)
+    assert.ok(start >= 0 && end > start, source)
+    assert.ok(
+      end / MOCAP_FPS <= clip.duration + 1e-4,
+      `${source}: end exceeds recording`,
+    )
+    const armTrack = clip.tracks.find(
+      (track) => track.name === 'RightArm.quaternion',
+    )!
+    assert.equal(armTrack.times[0], 0, source)
+    assert.ok(
+      Math.abs(armTrack.times[1] - 1 / MOCAP_FPS) < 1e-6,
+      `${source}: unexpected sampling rate`,
+    )
+    const trimmed = trimAnimation(clip, start / MOCAP_FPS, end / MOCAP_FPS)
     assert.equal(trimmed.tracks.length, clip.tracks.length, source)
-    assert.ok(Math.abs(trimmed.duration - (end - start) / 25) < 1e-5, source)
+    assert.ok(
+      Math.abs(trimmed.duration - (end - start) / MOCAP_FPS) < 1e-5,
+      source,
+    )
     let maxEndArmAngle = 0
     trimmed.tracks.forEach((track, i) => {
       assert.equal(track.times[0], 0, `${source}: ${track.name}`)
       assert.ok(track.validate(), `${source}: ${track.name}`)
       const original = clip.tracks[i]
-      const expected = original.createInterpolant().evaluate(start / 25)
+      const expected = original.createInterpolant().evaluate(start / MOCAP_FPS)
       const size = track.getValueSize()
-      const expectedEnd = original.createInterpolant().evaluate(end / 25)
+      const expectedEnd = original.createInterpolant().evaluate(end / MOCAP_FPS)
       for (let j = 0; j < size; j++) {
         assert.ok(
           Math.abs(

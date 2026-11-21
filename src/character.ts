@@ -13,7 +13,7 @@ import {
 } from 'three'
 
 import { KeyframeAnalyzer } from './analyze'
-import { animationFrameRanges } from './animation'
+import { animationFrameRanges, MOCAP_FPS } from './animation'
 import { BoneRotationManager } from './bone-rotation'
 import { CameraPresetKey } from './camera'
 import { dispose } from './dispose'
@@ -87,12 +87,12 @@ export type CharacterKey = keyof typeof Params.prototype.characters
 const NTH_FRAME_TICK = 58
 const ROOT_POSITION_TRACKS = new Set(['Hips.position', 'Reference.position'])
 
-// Playback limits on the trimmed timeline, at 25 fps.
+// Playback limits on the trimmed timeline.
 export const resetLimits: Partial<Record<ModelKey, number>> =
   Object.fromEntries(
     Object.entries(animationFrameRanges).map(([source, { start, end }]) => [
       source.slice('v2-models/'.length, -'.glb'.length),
-      (end - start) / 25,
+      (end - start) / MOCAP_FPS,
     ]),
   )
 
@@ -191,14 +191,14 @@ export class Character {
     'male-4': 'Skeletons|MAE_BOD_YAI_CHAPTER_4_TK0001_TAE_remap.001',
     'male-5': 'Skeletons|MAE_BOD_YAI_CHAPTER_5_TK0002_TAE_remap.001',
     'male-6': 'Skeletons|MAE_BOD_YAI_CHAPTER_6_TK0001_TAE_remap.001',
-    // Malechp7.glb retains a chapter 6 name inside the source file.
+    // Male_chpt_7.glb retains a chapter 6 name inside the source file.
     'male-7': 'Skeletons|MAE_BOD_YAI_CHAPTER_6_TK0001_TAE_remap.001',
     'male-8': 'Skeletons|MAE_BOD_YAI_CHAPTER_8_TK0001_TAE_remap.001',
     'male-9': 'Skeletons|MAE_BOD_YAI_CHAPTER_9_TK0001_TAE_remap.001',
     'male-end': 'Skeletons|MAE_BOD_YAI_END_TK0001_TAE_remap.001',
     'female-1': 'Skeletons|MAE_BOD_YAI_CHAPTER_1_TK0001_GADE_remap.001',
     'female-2': 'Skeletons|MAE_BOD_YAI_CHAPTER_2_TK0001_GADE_remap.001',
-    // Femalechp3.glb retains a chapter 4 name inside the source file.
+    // Female_chpt_3.glb retains a chapter 4 name inside the source file.
     'female-3': 'Skeletons|MAE_BOD_YAI_CHAPTER_4_TK0001_GADE_remap.001',
     'female-4': 'Skeletons|MAE_BOD_YAI_CHAPTER_4_TK0001_GADE_remap.001',
     'female-5': 'Skeletons|MAE_BOD_YAI_CHAPTER_5_TK0002_GADE_remap.001',
