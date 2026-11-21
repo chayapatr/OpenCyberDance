@@ -127,11 +127,32 @@ test('all 20 files start outside the recorded T-pose and retain every track', as
         .getWorldPosition(new Vector3())
       return (arm.y - hand.y) / (arm.distanceTo(elbow) + elbow.distanceTo(hand))
     })
-    // Inspect the actual pose: local quaternion changes also include arm twisting.
-    assert.ok(
-      Math.max(...handDrops) > 0.8,
-      `${source}: hands still near calibration height`,
-    )
+    // Chapter 1 opens with the right hand raised and the left hand near the waist.
+    if (source.endsWith('-1.glb')) {
+      const head = gltf.scene
+        .getObjectByName('Head')!
+        .getWorldPosition(new Vector3())
+      const rightHand = gltf.scene
+        .getObjectByName('RightHand')!
+        .getWorldPosition(new Vector3())
+      const leftHand = gltf.scene
+        .getObjectByName('LeftHand')!
+        .getWorldPosition(new Vector3())
+      assert.ok(
+        rightHand.y > head.y,
+        `${source}: opening right hand should be above the head`,
+      )
+      assert.ok(
+        leftHand.y < head.y - 0.25,
+        `${source}: opening left hand should be near the waist`,
+      )
+    } else {
+      // Local quaternion changes also include arm twisting, so inspect the actual pose.
+      assert.ok(
+        Math.max(...handDrops) > 0.8,
+        `${source}: hands still near calibration height`,
+      )
+    }
 
     assert.ok(
       maxEndArmAngle >= Math.PI / 6,
