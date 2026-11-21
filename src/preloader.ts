@@ -1,7 +1,7 @@
 import { DRACOLoader } from 'three/addons/loaders/DRACOLoader.js'
 import { GLTF, GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader'
 
-import { animationFrameRanges, trimAnimation } from './animation'
+import { animationFrameRanges, MOCAP_FPS, trimAnimation } from './animation'
 
 export class ModelPreloader {
   models: Map<string, GLTF> = new Map()
@@ -40,7 +40,7 @@ export class ModelPreloader {
       const range = animationFrameRanges[source]
       if (range) {
         model.animations = model.animations.map((clip) =>
-          trimAnimation(clip, range.start / 25, range.end / 25),
+          trimAnimation(clip, range.start / MOCAP_FPS, range.end / MOCAP_FPS),
         )
       }
 
