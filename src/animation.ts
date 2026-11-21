@@ -4,13 +4,14 @@ import { AnimationClip } from 'three'
 export const MOCAP_FPS = 24
 
 // Playback windows exclude the opening and closing calibration poses.
-// Starts preserve the extra second after arm lowering approved for the previous exports.
+// Chapter 1 starts at the raised-arm pose: male at 8s, female at 7s.
+// Other starts preserve the extra second after arm lowering approved for the previous exports.
 // The END clips retain their recorded ending; neither ends in a T-pose.
 export const animationFrameRanges: Record<
   string,
   { start: number; end: number }
 > = {
-  'v2-models/male-1.glb': { start: 72, end: 3688 },
+  'v2-models/male-1.glb': { start: 192, end: 3688 },
   'v2-models/male-2.glb': { start: 64, end: 2441 },
   'v2-models/male-3.glb': { start: 70, end: 2413 },
   'v2-models/male-4.glb': { start: 82, end: 2410 },
@@ -20,7 +21,7 @@ export const animationFrameRanges: Record<
   'v2-models/male-8.glb': { start: 75, end: 2266 },
   'v2-models/male-9.glb': { start: 89, end: 2423 },
   'v2-models/male-end.glb': { start: 75, end: 2208 },
-  'v2-models/female-1.glb': { start: 62, end: 3663 },
+  'v2-models/female-1.glb': { start: 168, end: 3663 },
   'v2-models/female-2.glb': { start: 64, end: 2428 },
   'v2-models/female-3.glb': { start: 71, end: 2399 },
   'v2-models/female-4.glb': { start: 71, end: 2399 },
